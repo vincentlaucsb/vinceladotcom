@@ -1,0 +1,39 @@
+$shadow-color: rgb(0, 0, 0);
+$no-shadow: 0 0 0 rgba($shadow-color, 0);
+$end-shadow: 0 2px 10px rgba($shadow-color, 0.5);
+
+.navbar-fixed {
+    position: fixed;
+    top: 0;
+    
+    /* Add other desired CSS properties here */
+    background: rgba(0, 0, 0, 0.9);
+    
+    box-shadow: $end-shadow;
+    
+    animation-duration: 3s;
+    animation-name: cast-shadow;
+}
+
+/* Exists mainly for the receding shadow animation */
+.navbar-unfixed {
+    box-shadow: $no-shadow;
+    
+    animation-duration: 3s;
+    animation-name: remove-shadow;
+    
+    /* Doesn't work???
+    animation-direction: reverse;
+    animation-name: cast-shadow;
+    */
+}
+
+@keyframes cast-shadow {
+  from { box-shadow: $no-shadow; }
+  to { box-shadow: $end-shadow; }
+}
+
+@keyframes remove-shadow {
+  from { box-shadow: $end-shadow; }
+  to { box-shadow: $no-shadow; }
+}

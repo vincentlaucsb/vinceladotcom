@@ -1,0 +1,62 @@
+@import 'colors';
+
+/* n rows by 3 columns grid */
+.grid-container-nx3 {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    
+    font-size: $smaller-size;
+    
+    margin-top: $big-skip;
+    margin-bottom: $big-skip;
+    
+    * {
+        margin: 0;
+        margin-bottom: $small-skip;
+    }
+    
+    p { max-width: 100%; }
+    
+    > div, > section {
+        min-width: 15em;
+        width: 26%; /* 33.33% - padding */
+        margin-right: 2%;
+        margin-bottom: $skip;
+        padding: $skip 2% $skip 2%;
+        
+        line-height: 1.35;
+        
+        /* A e s t h e t i c s */
+        border: 1px solid darken($light-gray, 10%);
+        
+        /* Allows items to expand to fill up missing space */
+        flex-grow: 1;
+        
+        /* Distribute items equally vertically */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        
+        /* Buttons */
+        p:last-child {
+            width: 100%;
+            text-align: right;
+            margin-bottom: 0;
+            
+            a { margin-left: 0.5em; }
+        }
+    }
+    
+    h2 {
+        border: 0;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+}
+
+/* For Projects page */
+h3 span {
+    font-size: $small-size;
+    display: block;
+}

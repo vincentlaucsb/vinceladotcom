@@ -1,0 +1,57 @@
+@import 'colors';
+
+/* Code for /python */
+/* Counter Code */
+body { counter-reset: section page subpage; }
+
+.section:before {
+    counter-increment: section;
+    content: counter(section)". ";
+}
+
+.section { counter-reset: page; }
+
+.subpage {
+    a:before {
+        counter-increment: subpage;
+        content: counter(section)"."counter(page)"."counter(subpage)" ";
+        min-width: 3em;
+    }
+}
+
+.superpage {
+    counter-reset: subpage;
+    a:before {
+        counter-increment: page;
+        content: counter(section)"."counter(page)" ";
+    }   
+}
+
+/* End of Counter Code */
+#content {
+    ul.section-list, li.subpage-container ul {
+        padding: 0;
+        font-size: $regular-size;
+
+        li {
+            list-style-type: none;
+            list-style-position: inside;
+        }
+        
+        li.superpage, li.subpage {
+            padding-top: 0.1em;
+            padding-bottom: 0.1em;
+        }
+    }
+    
+    li.subpage-container ul {
+        margin: 0;
+    }
+}
+
+/* For the 'Contributors' section */
+ul.contrib img {
+    width: 20px;
+    padding: 0 3px 0 3px;
+    opacity: 0.8;
+}

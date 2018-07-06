@@ -1,0 +1,28 @@
+/* Tidbits */
+#content .file-download:after {
+    content: " (Click here to download)";
+    font-size: 80%;
+}
+
+.see-also {
+    font-style: italic;
+    margin-top: -0.5em;
+    display: block;
+}
+
+.see-also:before {
+    content: "See also: "
+}
+/* End of Tidbits */
+
+/* Sidebar */
+#sidebar li { list-style-type: none; }
+
+/* Next/Previous Tutorial Links */
+#next-tut { 
+    display: flex;
+    justify-content: space-between;
+    
+    a { max-width: 15em; }
+    a:last-child { text-align: right; }
+}

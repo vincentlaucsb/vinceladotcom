@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Vincent La">
+    <meta name="google-site-verification" content="0qsjBnF6SEUQQOQv6GOKxr3l2oy-Y-3tT3ayXzreWlA" />
+    <title>Vincent La</title>
+    
+	<style type="text/css">body {
+    background:
+        linear-gradient(to bottom, rgba(41, 41, 41, 0.5) 0%, rgba(41, 41, 41, 0.5)),
+        linear-gradient(to bottom, rgba(41, 41, 41, 0.5) 0%, rgba(41, 41, 41, 0.5)),
+        url({{ url_for('static', filename='images/young_nigga.jpg') }});
+    background-size: 100vw auto;
+    
+    /* Add backdrop, then desaturate background pic a little */
+    background-blend-mode: normal, saturation;
+    }</style>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700' rel='stylesheet' type='text/css'>
+    
+	<link href="{{ url_for('static', filename='theme/css/index-css/index.css') }}" media="all" rel="stylesheet" type="text/css">
+    
+    <script type="text/javascript">
+        var last_known_scroll_position = 0;
+        var ticking = false;
+
+        function doSomething(scroll_pos) {
+          var aboutme = document.getElementById('about');
+          
+          // do something with the scroll position
+          var vh = window.innerHeight;
+          var current_style = aboutme.getAttribute("style");
+          // Made the "About Me" section fade-in as user keeps scrolling
+          if (scroll_pos > 0) {
+            aboutme.setAttribute("style",current_style + "; opacity: " + (scroll_pos/vh));
+          }
+          else {
+            aboutme.setAttribute("style",current_style + "; opacity: 1");
+          }
+        }
+
+        window.addEventListener('scroll', function(e) {
+          last_known_scroll_position = window.scrollY;
+          if (!ticking) {
+            window.requestAnimationFrame(function() {
+              doSomething(last_known_scroll_position);
+              ticking = false;
+            });
+          }
+          ticking = true;
+        });
+    </script>
+</head>
+<body>
+
+<!--<div id="overlay"></div>-->
+<div id="content">
+    <h1 id="name"><span class="condensed">Vincent</span><br /> La</h1>
+    <p>Hi, and welcome to my online home! Feel free to explore my work, or scroll down to <strong>read more</strong> about me.</p>
+    </p>
+    <nav>
+        <ul>
+            <li id="about-link"><a href="#about">About</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/resume">Resume</a></li>
+        </ul>
+    </nav>
+</div>
+    
+<section id="about">
+    <h1>About Me</h1>
+    <h2></h2>
+    <p>Hi! I'm Vincent La and I'm currently working on a Bachelors in Mathematics from the University of California--Santa Barbara. (Math is truly a wonderful subject! However, high school math should probably be considered a form of torture.) Some of my academic interests include data visualization, moral philosophy, logic, and history.
+    </p>
+    <p>
+    In the outside world (A.K.A. the real world), my interests include football (the one with shoulder pads) and basketball, barbecuing, running, and long walks on the beach.
+    </p>
+    <p>If you would like to get into contact with me, you may reach me at vincela9(at)gmail.com (no timeshare offers please) or visit one of my 
+    profiles below.
+    </p>
+    <p style="text-align: center">
+        <a href="https://www.linkedin.com/in/vincent-la-sb"><img style="height: 60px; margin-right: 1em;" src="/static/images/social-media/linkedin-box.png"></img></a>
+        <a href="https://github.com/vincentlaucsb"><img style="height: 60px; filter: invert(100%);" src="/static/images/social-media/mark-github.svg"></img></a>
+    </p>
+</section>
+
+</body>
+</html>

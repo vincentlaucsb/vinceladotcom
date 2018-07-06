@@ -1,0 +1,104 @@
+@import 'colors';
+
+$content-max-width: 35em;
+$sidebar-max-width: 20em;
+
+/** Sidebar **/
+#sidebar-wrapper {
+    min-width: 10em;
+    max-width: $sidebar-max-width;
+    
+    background: lighten($teal, 45%);
+    
+    flex-grow: 1;
+}
+
+#sidebar {
+    ul {
+        padding-left: 0;
+        list-style-position: inside;
+        
+        li { line-height: 2em; }
+    }
+}
+
+/* Table of Contents: shit needs to be fixed */
+#toc-container {
+    overflow-y: auto;
+}
+
+.toc-h3 {
+    padding-left: 1em;
+    font-style: italic;
+}
+
+/** End of sidebar **/
+
+/** Content **/
+article {
+    font-size: $smaller-size;
+    padding-top: $skip;
+    margin-bottom: $big-skip;
+    
+    display: flex;
+    flex-wrap: nowrap;
+    
+    #sidebar > *:first-child, #content > *:first-child {
+        margin-top: 0;
+    }
+}
+
+#content {
+    /* Make #content expand to fill whitespace without allowing
+       child elements to grow exceed ~80 characters/line */
+    flex-grow: 1;
+    * { max-width: $content-max-width; }
+    
+    @extend .container;
+}
+
+/* Quiz Code */
+#content > form > div:not(first-child) {
+    margin: 2em 0 2em 0;
+}
+/** End of Content **/
+
+@media (min-width: 1100px) {
+    @include container-width(80%);
+    
+    /** Begin content **/
+    /* Structure */
+    article { flex-direction: row; }
+
+    #sidebar-wrapper { margin-left: 5%; }
+
+    /* Also used in portrait mode for the table of contents */
+    #content { order: 1; }
+    #sidebar-wrapper {
+        order: 2;
+        font-size: $small-size;
+        padding: 1em;
+        
+        h2 {
+            font-weight: normal;
+            margin-top: $small-skip;
+            border: 0;
+        }
+    }
+    /* End Structure */
+    /** End content **/
+
+}
+
+@media (max-width: 1099px) {   
+    @include container-width(90%);
+    
+    /** Begin content **/
+    article { flex-direction: column; }
+    #content { order: 2; }
+    #sidebar-wrapper {
+        order: 1;
+        @expand #content;
+    }
+    /** End content **/
+}

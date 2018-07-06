@@ -1,0 +1,6 @@
+flask
+wtforms
+peewee
+flask-login
+passlib
+mistune

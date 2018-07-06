@@ -1,0 +1,6 @@
+# Secrets
+secret.py
+*.sqlite
+
+# Python
+*.pyc

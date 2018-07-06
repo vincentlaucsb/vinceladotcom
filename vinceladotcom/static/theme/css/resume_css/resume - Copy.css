@@ -1,0 +1,118 @@
+body {
+    font-family: Georgia, serif;
+    font-size: 12pt;
+    max-width: 45em;
+    line-height: 1.5;
+    margin: 2em auto 10% auto;
+    color: #333333;
+    background-color: rgba(0,0,0,.02);
+}
+
+/* Start with having everything have zero margins
+ * Then add more as appropriate
+ */
+body * { margin: 0; }
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
+/* Header Stylings */
+h1, h2, header {
+    font-family: Montserrat, sans-serif;
+}
+
+#name h1 { font-size: 3em; text-transform: uppercase; }
+
+h2 { text-transform: uppercase; }
+
+/* Years Worked/Attended */
+h3 > span:not(.subtitle) {
+    font-weight: normal;
+    float: right;
+}
+
+h4 { margin-bottom: 0; }
+
+/* Tighten up spacing between elements */
+h2, h3, h4, ul { margin-bottom: 0.2em; }
+h3, h4 { margin-top: 1em; }
+
+/* Header: Name and Contact Info */
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: auto;
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+    flex-wrap: wrap;
+}
+
+#contact {
+    font-size: 95%;
+    line-height: 1.6;
+}
+
+#phone { margin-left: 1.5em; }
+/* End Header */
+
+/* Resume Body */
+section + section {
+    margin-top: 3em;
+}
+
+h3 + p > em {
+    font-style: italic;
+    margin-top: -0.2em;
+}
+/* End of Resume Body */
+
+/* Skills Section */
+#skills-box {
+    display: flex;
+    flex-direction: row;
+    align-content: stretch;
+    flex-wrap: wrap;
+}
+
+#skills-box > section {
+    /*min-width: 20em;*/
+    width: calc(50% - 1em); /* 100% divided by number of columns minus padding */
+    padding-right: 1em;
+}
+
+#skills-box > section, #skills-box h3 {
+    margin: 0;
+}
+
+#skills-box li > ul {
+    padding: 0.1em 0 0.1em 1em;
+}
+/* End of skills */
+
+/* General List Styling */
+ul {
+    list-style: square outside none;
+    padding-left: 1em;
+    margin-top: 0.5em;
+}
+
+li > ul { margin-top: 0; }
+li > ul li { 
+    list-style: disc outside none;
+}
+/* End of list styling */
+
+/* Responsive CSS Settings */
+@media screen and (max-width: 700px) {
+    h3 > span:not(.subtitle) {
+        float: none;
+        display: block;
+    }
+    #skills-box > section { width: 100%; }
+    #contact { text-align: left; }
+}

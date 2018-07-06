@@ -1,0 +1,20 @@
+.spoiler {
+    display: none;
+}
+
+.spoiler-spoiled {
+    display: normal;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+    animation-name: fade-in;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
