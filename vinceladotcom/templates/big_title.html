@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block more_head %}
+<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+
+<style type="text/css">
+    .title-big {
+        background:
+            linear-gradient(to bottom,
+                            rgba(41, 41, 41, 0.2) 0%,
+                            rgba(41, 41, 41, 0.2)),
+            url('/static/images/june_lake_boi.jpg');
+        background-size: 100vw;
+        background-blend-mode: saturation;
+    }
+</style>
+{% endblock %}
+
+{% block title_class %}title-big{% endblock %}
+{% block title %}{% endblock %}
+{% block page_title %}{% endblock %}
+
+{% block content %}{% endblock %}

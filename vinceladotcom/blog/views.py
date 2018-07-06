@@ -1,7 +1,7 @@
 import flask_login
 from flask import Blueprint, request
 from .forms import *
-from .. import database
+from .. import database, markdown
 from ..config import render_template
 
 blog = Blueprint('blog', __name__)
@@ -12,25 +12,64 @@ def blog_list():
     drafts = []
     
     for post in database.BlogPost.select():
-        if post.draft:
+        if not post.draft:
             posts.append(post)
         else:
             drafts.append(post)
             
-    return render_template('blog_index.html', posts=posts, drafts=drafts)
+    return render_template('blog/index.html', posts=posts, drafts=drafts)
 
+@blog.route("/blog/<title>", methods=['GET'])
 def blog_article(title):
-    try:
-        article_id = BLOG_ARTICLES[database.title_to_url(title)]
-    except KeyError:
-        return render_template('404.html'), 404
-        
+    # Load list of BlogPosts
+    if not database.BlogPost.urls:
+        for i in database.BlogPost.select():
+            pass
+    
+    # Render article
+    article_id = database.BlogPost.urls[title]
     article = database.BlogPost.get(database.BlogPost.id == article_id)
     return render_template(
-        'blog_post.html',
+        'blog/post.html',
         post=article,
         title=article.title,
         content=markdown.parse_markdown(article.content)
+    )
+    
+@blog.route("/blog/edit/<int:post_id>", methods=['GET', 'POST'])
+def blog_edit(post_id):
+    # Render article
+    blog = database.BlogPost.get(database.BlogPost.id == post_id)
+    form = BlogForm(request.form)
+    preview = ''
+    
+    # Form Attributes
+    if request.method == 'GET':
+        form.page_title.data = blog.title
+        form.content.data = blog.content
+        form.draft.data = blog.draft
+    
+    # Show a preview of the rendered Markdown
+    elif request.method == 'POST':
+    
+        # Submit button pressed
+        if form.submit.data:
+            database.BlogPost(
+                id=blog.id,
+                title=form.page_title.data,
+                author='Vincent La',
+                draft=form.draft.data,
+                content=form.content.data
+            ).save()
+            
+        # Preview button pressed
+        else:
+            preview = markdown.parse_markdown(form.content.data)
+    
+    return render_template('blog/editor.html',
+        form=form,
+        preview=preview,
+        target='/blog/edit/' + str(post_id)
     )
     
 @blog.route("/blog/new", methods=['GET', 'POST'])
@@ -44,9 +83,9 @@ def blog_post():
         # Submit button pressed
         if form.submit.data:
             database.BlogPost.create(
-                title=form.title.data,
+                title=form.page_title.data,
                 author='Vincent La',
-                draft=True,
+                draft=form.draft,
                 content=form.content.data
             )
             
@@ -54,4 +93,9 @@ def blog_post():
         else:
             preview = markdown.parse_markdown(form.content.data)
     
-    return render_template('blog_new.html', form=form, preview=preview)
+    return render_template(
+        'blog/editor.html',
+        form=form,
+        preview=preview,
+        target='/blog/new'
+    )

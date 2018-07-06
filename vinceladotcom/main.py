@@ -67,21 +67,6 @@ Beginning of App
 @app.route("/", methods=['GET'])
 def index():
     return render_template('index.html')
-
-@app.route("/pages/", methods=['GET'])
-@login_required
-def page_list():
-    posts = []
-    drafts = []
-    
-    for post in database.Page.select():
-        posts.append(post)
-        #if post.draft:
-            
-        #else:
-            #drafts.append(post)
-            
-    return render_template('pages/index.html', posts=posts, drafts=drafts)
     
 @app.route("/sitemap.xml", methods=['GET'])
 def sitemap():
@@ -108,16 +93,19 @@ def sitemap():
     return response
 
 def run():
-    # Route blog posts
-    for post in database.BlogPost.select():
-        app.add_url_rule('/blog/' + post.url(), view_func=blog.views.blog_article, methods=['GET'])
-        
+    # Create tables (if not exist)
+    database.db.create_tables([
+        database.Users,
+        database.BlogPost,
+        database.Page
+    ])
+
     # Route pages
-    for page in database.Page.select():
-        router = pages.urls.make_router(page)
+    for p in database.Page.select():
+        router = pages.urls.make_router(p)
         app.add_url_rule(router.url, view_func=router)
         print("Routing {}".format(router.url))
-
+        
     app.register_blueprint(blog.views.blog)
     app.register_blueprint(pages.views.page)
     app.run(host='0.0.0.0')

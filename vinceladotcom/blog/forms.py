@@ -1,8 +1,10 @@
-from wtforms import validators, Form, TextAreaField, TextField, SubmitField
+from wtforms import validators, Form, BooleanField, TextAreaField, \
+    TextField, SubmitField
 
 class BlogForm(Form):
     content = TextAreaField()
-    title = TextField()
+    page_title = TextField()
     author = TextField()
     submit = SubmitField()
     preview = SubmitField()
+    draft = BooleanField(default=True)
