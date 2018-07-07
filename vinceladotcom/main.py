@@ -12,7 +12,7 @@ import os
 from os import path
 
 # My Libraries
-from .sitemap import SitemapEntry
+from .sitemap import Sitemap, SitemapEntry
 from .config import *
 from . import auth, markdown, database, blog, pages
 
@@ -72,22 +72,29 @@ def index():
 def sitemap():
     ''' Generate a sitemap.xml at the root '''
     
-    entries = ''
-
+    _sitemap = Sitemap(request.url_root)
+    
+    for i in app.url_map.iter_rules():
+        url = str(i)
+        
+        entry = SitemapEntry()
+        entry['loc'] = url
+        
+        if (url.find('<') < 0 or url.find('>') < 0):
+            _sitemap.add(entry)
+        
     for post in database.BlogPost.select():
         entry = SitemapEntry()
         entry['loc'] = 'blog/' + post.url()
         entry['lastmod'] = post.modified
-        
-        entries += entry.to_string(request.url_root)
+        _sitemap.add(entry)
         
     for post in database.Page.select():
         entry = SitemapEntry()
-        entry['loc'] = post.url[1:] # Strip out leading /
-        
-        entries += entry.to_string(request.url_root)
+        entry['loc'] = 'pages/' + post.url
+        _sitemap.add(entry)
 
-    sitemap_xml = render_template('sitemap.xml', entries=entries)
+    sitemap_xml = render_template('sitemap.xml', entries=str(_sitemap))
     response = flask.make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
     return response
@@ -99,12 +106,6 @@ def run():
         database.BlogPost,
         database.Page
     ])
-
-    # Route pages
-    for p in database.Page.select():
-        router = pages.urls.make_router(p)
-        app.add_url_rule(router.url, view_func=router)
-        print("Routing {}".format(router.url))
         
     app.register_blueprint(blog.views.blog)
     app.register_blueprint(pages.views.page)

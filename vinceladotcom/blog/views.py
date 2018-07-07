@@ -66,7 +66,8 @@ def blog_edit(post_id):
         else:
             preview = markdown.parse_markdown(form.content.data)
     
-    return render_template('blog/editor.html',
+    return render_template(
+        'blog/editor.html',
         form=form,
         preview=preview,
         target='/blog/edit/' + str(post_id)

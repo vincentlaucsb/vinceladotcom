@@ -1,17 +1,39 @@
+class Sitemap(object):
+    ''' Sitemap generator '''
+    
+    def __init__(self, url_root):
+        super(Sitemap, self).__init__()
+        self.entries = []
+        self.url_root = url_root
+    
+    def add(self, entry):
+        ''' Add a sitemap entry '''
+        self.entries.append(entry)
+    
+    def __str__(self):
+        entries = ''
+        
+        for i in self.entries:
+            entries += i.to_string(self.url_root)
+            
+        return entries
+
 class SitemapEntry(dict):
     def __init__(self, *args, **kwargs):
         super(SitemapEntry, self).__init__(*args, **kwargs)
         
     def to_string(self, site_url):
         ret = ''
-        ret += '<url>\n'
+        ret += '\t<url>\n'
         
         for k, v in self.items():
             if k == 'loc':
+                if (v[0] == '/'): # Strip out leading /
+                    v = v[1:]
                 v = site_url + v
             
-            ret += '\t<{key}>{val}</{key}>\n'.format(
+            ret += '\t\t<{key}>{val}</{key}>\n'.format(
                 key=k, val=v)
             
-        ret += '</url>\n'
+        ret += '\t</url>\n'
         return ret

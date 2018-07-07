@@ -42,17 +42,6 @@ class Page(BasePage):
     content = TextField()
     markdown = BooleanField(default=False)
     
-    def __init__(self, *args, **kwargs):
-        # Add a leading slash to work with Flask URL routing
-        if kwargs['url'][0] != '/':
-            kwargs['url'] = '/' + kwargs['url']
-        
-        # Add a trailing slash
-        if kwargs['url'][-1] != '/':
-            kwargs['url'] += '/'
-        
-        super(Page, self).__init__(*args, **kwargs)
-    
 class Users(BaseModel):
     name = CharField(200)
     password = TextField() # Should not be plaintext

@@ -4,7 +4,7 @@
     "main_menu": [
         ["About", "/#about"],
         ["Blog", "/blog"],
-        ["Projects", "/projects"],
-        ["Resume", "/resume"]
+        ["Projects", "/pages/projects"],
+        ["Resume", "/pages/resume"]
     ]
 }

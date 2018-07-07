@@ -1,9 +1,10 @@
 from flask_login import login_required
+import flask_login
+
 from flask import Blueprint, request
-from .urls import make_router
 from .forms import *
 from .. import database
-from ..config import render_template
+from ..config import render_template, PAGE_GLOBALS
 
 page = Blueprint('page', __name__)
 
@@ -21,6 +22,22 @@ def page_list():
             #drafts.append(post)
             
     return render_template('pages/index.html', posts=posts, drafts=drafts)
+        
+@page.route("/pages/<title>", methods=['GET'])
+def page_view(title):
+    ''' Render a page '''
+    page = database.Page.get(database.Page.url == title)
+    template = page.template
+    if not template:
+        template = 'base_page.html'
+    
+    print(template)
+    
+    return render_template(
+        template,
+        page = page,
+        **PAGE_GLOBALS
+    )
         
 @page.route("/pages/new", methods=['GET', 'POST'])
 @login_required
