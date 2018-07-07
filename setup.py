@@ -10,6 +10,7 @@ setup(
         'peewee',      # ORM
         'flask-login', # User management
         'passlib',     # Hashing
-        'mistune'      # Markdown Parsing
+        'mistune',     # Markdown Parsing
+        'pytest'
     ],
 )

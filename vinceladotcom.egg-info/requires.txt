@@ -4,3 +4,4 @@ peewee
 flask-login
 passlib
 mistune
+pytest

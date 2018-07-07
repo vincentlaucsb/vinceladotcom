@@ -1,11 +1,9 @@
 vinceladotcom/__init__.py
 vinceladotcom/auth.py
+vinceladotcom/config.py
 vinceladotcom/database.py
-vinceladotcom/globals.py
-vinceladotcom/helpers.py
 vinceladotcom/main.py
 vinceladotcom/markdown.py
-vinceladotcom/pages.py
 vinceladotcom/secret.py
 vinceladotcom/sitemap.py
 vinceladotcom.egg-info/PKG-INFO

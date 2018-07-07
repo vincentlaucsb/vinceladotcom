@@ -3,4 +3,5 @@ secret.py
 *.sqlite
 
 # Python
+.cache/
 *.pyc

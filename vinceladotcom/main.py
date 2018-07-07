@@ -50,15 +50,21 @@ def login():
     else:
         error = "Login failed"
     
-    return flask.render_template('login.html', form=form,
-        error=error)
+    return render_template(
+        'login.html',
+        form=form,
+        error=error
+    )
     
 @app.route('/logout')
 @login_required
 def logout():
-    # flask_login.current_user.is_authenticated = False
     flask_login.logout_user()
-    return redirect('/')
+    return render_template(
+        'message.html',
+        title='Logged out',
+        message='You have been logged out.'
+    )
     
 '''
 Beginning of App
@@ -99,13 +105,16 @@ def sitemap():
     response.headers["Content-Type"] = "application/xml"
     return response
 
-def run():
-    # Create tables (if not exist)
+def init_db():
     database.db.create_tables([
         database.Users,
         database.BlogPost,
         database.Page
     ])
+    
+def run():
+    # Create tables (if not exist)
+    init_db()
         
     app.register_blueprint(blog.views.blog)
     app.register_blueprint(pages.views.page)

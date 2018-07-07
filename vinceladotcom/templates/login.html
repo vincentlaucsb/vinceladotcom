@@ -1,87 +1,18 @@
-<!DOCTYPE html>
-<html lang="{{ language }}">
-<head>
-        {% block head %}
-        <title>{% block title %}{% endblock title %} - {{ site_name }}</title>
-        <meta charset="utf-8" />
-        {% endblock head %}
-        
-    <!-- Custom Fonts -->
-    <link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700' rel='stylesheet' type='text/css'>
-    
-    <!-- Default CSS -->
-    <link href="{{ url_for('static', filename='theme/css/shared.css') }}" rel='stylesheet' type='text/css'>
-    
-    <!-- Header -->
-    <script src="{{ url_for('static', filename='theme/js/header.js') }}"></script>
-    <link href="{{ url_for('static', filename='theme/js/header.css') }}" rel="stylesheet" type="text/css">
-    
-    <!-- Highlighting -->
-    <!-- Ref: https://highlightjs.org/usage/ -->
-    <link rel="stylesheet" href="/theme/highlight/styles/zenburn.css">
-    <script src="{{ url_for('static', filename='theme/highlight/highlight.pack.js') }}"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    
-    <!-- Remove this block later -->
-    {% block base_head %}{% endblock %}
-    
-    {% block more_head %}{% endblock %}
-</head>
+{% extends "base.html" %}
 
-<body>
-    <header id="navbar-top" class="header-fixed">
-        <h1><a href="/"><span id="vincent">Vincent</span> La</a></h1>
-        <nav>
-            {% for link in main_menu %}
-                <a href="{{ link[1] }}">{{ link[0] }}</a>
-            {% endfor %}
-        </nav>
-    </header>
+{% block more_head %}
+<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
 
-    <!-- title_class options are "title-big" and "title-regular" -->
-    <div id="title" class="{% block title_class %}title-regular{% endblock %}">
-        {% block breadcrumbs %}{% endblock %}
-        <h1>{% block page_title %}{% endblock %}</h1>
-    </div>
+{% endblock %}
+
+{% block title %}Log In{% endblock %}
+{% block page_title %}Log In{% endblock %}
     
-    <!-- Main content goes here -->
-    <article>
-        <form action="/login" method="post">
-            {% block content %}
-            Name: {{ form.name }}
-            Password: {{ form.password }}
-            
-            {% endblock %}
-            
-            {{ form.submit }}
-        </form>
+{% block content %}
+    <form action="/login" method="post">
+        Name: {{ form.name }}
+        Password: {{ form.password }}
         
-        {% if error %}
-            {{ error }}
-        {% endif %}
-    </article>
-    
-    <footer>
-        <nav>
-            {% for link in main_menu %}
-                <a href="{{ link[1] }}">{{ link[0] }}</a>
-            {% endfor %}
-        </nav>
-        
-        <h3>Find Me</h3>
-        <p>
-            <a href="https://www.linkedin.com/in/vincent-la-sb"><img src="/static/images/social-media/linkedin-box.png"></img></a>
-            <a href="https://github.com/vincentlaucsb"><img style="filter: invert(100%);" src="/static/images/social-media/mark-github.svg"></img></a>
-        </p>
-        
-        <p>
-            &copy; 2016-2018 Vincent La
-            <span style="float: right">
-                <a href="/pages/">Add New Page</a>
-                <a href="/pages/">Add New Blog Post</a>
-                <a href="https://github.com/vincentlaucsb/vincela.com">(Source Code)</a>
-            </span>
-        </p>
-    </footer>
-</body>
-</html>
+        {{ form.submit }}
+    </form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block more_head %}
+<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+
+{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+    
+{% block content %}
+    {{ message }}
+{% endblock %}
