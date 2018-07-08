@@ -31,8 +31,6 @@ def page_view(title):
     if not template:
         template = 'base_page.html'
     
-    print(template)
-    
     return render_template(
         template,
         page = page,
@@ -76,7 +74,6 @@ def page_edit(page_id):
     ''' Update an existing page '''
     page = database.Page.get(database.Page.id == page_id)
     form = PageForm(request.form)
-    
     preview = ''
     
     # Show a preview of the rendered HTML

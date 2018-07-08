@@ -19,6 +19,7 @@ class BasePage(BaseModel):
     title = CharField(200, unique=True)
     tags = TextField(default='[]')
     deleted = BooleanField(default=False)
+    meta = TextField(default='')
 
 class BlogPost(BasePage):
     author = CharField(200)

@@ -3,6 +3,7 @@ import os
 from wtforms import validators, Form, BooleanField, TextAreaField, \
     TextField, SelectField, SubmitField
 from ..config import CURRENT_DIR
+from ..forms import AceText, AceTextField
 
 def get_templates():
     templates = []
@@ -14,7 +15,7 @@ def get_templates():
     return templates
 
 class PageForm(Form):
-    content = TextAreaField()
+    content = AceTextField()
     custom_css = TextAreaField()
     page_title = TextField()
     url = TextField()
