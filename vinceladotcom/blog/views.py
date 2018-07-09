@@ -1,5 +1,5 @@
 import flask_login
-from flask import Blueprint, request
+from flask import Blueprint, request, redirect
 from .forms import *
 from .. import database, markdown
 from ..config import render_template
@@ -32,7 +32,6 @@ def blog_article(title):
     return render_template(
         'blog/post.html',
         post=article,
-        title=article.title,
         content=markdown.parse_markdown(article.content)
     )
     
@@ -41,6 +40,7 @@ def blog_edit(post_id):
     # Render article
     blog = database.BlogPost.get(database.BlogPost.id == post_id)
     form = BlogForm(request.form)
+    
     preview = ''
     
     # Form Attributes
@@ -54,13 +54,8 @@ def blog_edit(post_id):
     
         # Submit button pressed
         if form.submit.data:
-            database.BlogPost(
-                id=blog.id,
-                title=form.page_title.data,
-                author='Vincent La',
-                draft=form.draft.data,
-                content=form.content.data
-            ).save()
+            database.BlogPost(id=blog.id, author=current_user.full_name, created=blog.created, **form.data_dict()).save()
+            return redirect('blog/' + blog.url())
             
         # Preview button pressed
         else:
@@ -68,6 +63,7 @@ def blog_edit(post_id):
     
     return render_template(
         'blog/editor.html',
+        current_user=current_user,
         form=form,
         preview=preview,
         target='/blog/edit/' + str(post_id)
@@ -83,12 +79,7 @@ def blog_post():
     
         # Submit button pressed
         if form.submit.data:
-            database.BlogPost.create(
-                title=form.page_title.data,
-                author='Vincent La',
-                draft=form.draft,
-                content=form.content.data
-            )
+            database.BlogPost.create(author=current_user.full_name, **form.data_dict())
             
         # Preview button pressed
         else:
@@ -96,6 +87,7 @@ def blog_post():
     
     return render_template(
         'blog/editor.html',
+        current_user=current_user,
         form=form,
         preview=preview,
         target='/blog/new'

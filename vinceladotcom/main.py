@@ -98,6 +98,7 @@ def sitemap():
     for post in database.Page.select():
         entry = SitemapEntry()
         entry['loc'] = 'pages/' + post.url
+        entry['lastmod'] = post.modified
         _sitemap.add(entry)
 
     sitemap_xml = render_template('sitemap.xml', entries=str(_sitemap))

@@ -17,7 +17,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 def settings_loader():
     with open(GLOBALS_PATH, 'r') as globals:
         return json.loads(globals.read())
-        
+
+# Global variables that all pages can access
 PAGE_GLOBALS = settings_loader()
 
 def render_template(*args, **kwargs):

@@ -1,9 +1,10 @@
 import os
+import json
 
-from wtforms import validators, Form, BooleanField, TextAreaField, \
+from wtforms import validators, ValidationError, Form, BooleanField, TextAreaField, \
     TextField, SelectField, SubmitField
 from ..config import CURRENT_DIR
-from ..forms import AceText, AceTextField
+from ..forms import *
 
 def get_templates():
     templates = []
@@ -14,10 +15,21 @@ def get_templates():
             
     return templates
 
-class PageForm(Form):
+class PageForm(BaseForm):
+    # Mapping of database column names to form names
+    db_mapping = dict(
+        title = 'page_title',
+        content = 'content',
+        css = 'custom_css',
+        url = 'url',
+        markdown = 'markdown',
+        meta = 'metadata'
+    )
+
     content = AceTextField()
+    metadata = AceTextField()
     custom_css = TextAreaField()
-    page_title = TextField()
+    page_title = TextField('')
     url = TextField()
     template = SelectField(
         'Template',
@@ -26,3 +38,11 @@ class PageForm(Form):
     submit = SubmitField()
     preview = SubmitField()
     markdown = BooleanField(default=False)
+    
+    def validate_metadata(form, field):
+        try:
+            if field.data:
+                json.loads(field.data)
+        except:
+            form.errors.append("Invalid JSON in field metadata")
+            raise ValidationError()

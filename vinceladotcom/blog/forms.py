@@ -1,11 +1,20 @@
+from flask_login import current_user
 from wtforms import validators, Form, BooleanField, TextAreaField, \
     TextField, SubmitField
-from ..forms import AceTextField
+from ..forms import BaseForm, AceTextField
 
-class BlogForm(Form):
-    content = AceTextField()
+class BlogForm(BaseForm):
+    # Mapping of database column names to form names
+    db_mapping = dict(
+        title = 'page_title',
+        content = 'content',
+        draft = 'draft',
+        meta = 'metadata' # Can't use meta because it's an instance attribute
+    )
+
+    content = AceTextField(mode='ace/mode/markdown')
+    metadata = AceTextField(mode='ace/mode/javascript')
     page_title = TextField()
-    author = TextField()
     submit = SubmitField()
     preview = SubmitField()
     draft = BooleanField(default=True)

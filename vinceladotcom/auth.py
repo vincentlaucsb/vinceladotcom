@@ -10,6 +10,7 @@ from passlib.hash import pbkdf2_sha256
 class UserForm(wtforms.Form):
     name = TextField()
     password = PasswordField() # Should not be plaintext
+    full_name = TextField()
     email = TextField()
     is_admin = BooleanField()
     
@@ -33,10 +34,11 @@ class LoginForm(wtforms.Form):
         
         return None
         
-def new_user(name, password, email, is_admin=False):
+def new_user(name, password, full_name, email, is_admin=False):
     database.Users(
         name=name,
         password=pbkdf2_sha256.hash(password),
+        full_name=full_name,
         email=email,
         is_admin=is_admin
     ).save()

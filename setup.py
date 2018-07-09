@@ -11,6 +11,7 @@ setup(
         'flask-login', # User management
         'passlib',     # Hashing
         'mistune',     # Markdown Parsing
+        'requests',    # GitHub API
         'pytest'
     ],
 )

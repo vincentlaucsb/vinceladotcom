@@ -1,6 +1,7 @@
 from peewee import *
 from playhouse.pool import PooledSqliteDatabase
 import datetime
+import json
 
 db = PooledSqliteDatabase(
     database='vince.sqlite'
@@ -18,13 +19,21 @@ class BaseModel(Model):
 class BasePage(BaseModel):
     title = CharField(200, unique=True)
     tags = TextField(default='[]')
+    created = DateField(default=datetime.datetime.now)
+    modified = DateField(default=datetime.datetime.now)
     deleted = BooleanField(default=False)
     meta = TextField(default='')
+    
+    def __init__(self, *args, **kwargs):
+        super(BasePage, self).__init__(*args, **kwargs)
+        
+        if self.meta:
+            meta_data = json.loads(self.meta)
+            for k, v in meta_data.items():
+                setattr(self, k, v)
 
 class BlogPost(BasePage):
     author = CharField(200)
-    created = DateField(default=datetime.datetime.now)
-    modified = DateField(default=datetime.datetime.now)
     draft = BooleanField(default=True)
     content = TextField()
     urls = {} # Mapping of titles to blog IDs
@@ -34,6 +43,7 @@ class BlogPost(BasePage):
         BlogPost.urls[ self.url() ] = self.id
     
     def url(self):
+        ''' Return URL of blog post relative to /blog/ '''
         return title_to_url(self.title)
     
 class Page(BasePage):
@@ -46,6 +56,7 @@ class Page(BasePage):
 class Users(BaseModel):
     name = CharField(200)
     password = TextField() # Should not be plaintext
+    full_name = CharField(200)
     email = CharField(200)
     is_admin = BooleanField(default=False)
     

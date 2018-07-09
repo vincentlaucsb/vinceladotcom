@@ -4,7 +4,7 @@
 
 {% block more_head %}
     <link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
-
+    <script src="/static/js/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>   
     <style type="text/css">
         .title-big {
             background:
@@ -16,7 +16,11 @@
             background-blend-mode: saturation;
         }
         
-        #editor {
+        textarea#content, textarea#metadata {
+            display: none;
+        }
+        
+        div.editor {
             width: 100%;
             height: 70vh;
             
@@ -26,8 +30,11 @@
             }
         }
         
-        textarea#content {
-            display: none;
+        .editor-fullscreen {
+            textarea {
+                width: 100%;
+                height: 100vh;
+            }
         }
         
         label {

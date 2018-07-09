@@ -1,10 +1,18 @@
 {% extends "base_editor.html" %}
 
-
 {% block title %}Pages{% endblock %}
 {% block page_title %}Pages{% endblock %}
 
 {% block content %}
+    {% if error %}
+    <h2>Error</h2>
+    <ul>
+        {% for i in error %}
+        <li>{{ i }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <h2>Edit Page</h2>
     <form action="{{ target }}" method="post">
         {{ form.csrf}}
@@ -26,6 +34,9 @@
         </label>
         
         {{ form.content }}
+        
+        <h3> Metadata</h3>
+        {{ form.metadata }}
 
     {{ form.submit }} {{ form.preview }}
     </form>

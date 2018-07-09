@@ -1,7 +1,9 @@
+from copy import copy
+
 from flask_login import login_required
 import flask_login
 
-from flask import Blueprint, request
+from flask import Blueprint, request, redirect
 from .forms import *
 from .. import database
 from ..config import render_template, PAGE_GLOBALS
@@ -74,6 +76,7 @@ def page_edit(page_id):
     ''' Update an existing page '''
     page = database.Page.get(database.Page.id == page_id)
     form = PageForm(request.form)
+    error = ''
     preview = ''
     
     # Show a preview of the rendered HTML
@@ -84,28 +87,29 @@ def page_edit(page_id):
         form.url.render_kw = { 'value': page.url }
         form.markdown.render_kw = { 'markdown': page.markdown }
         form.content.data = page.content
+        form.metadata.data = page.meta
     
     elif request.method == 'POST':
-    
-        # Submit button pressed
-        if form.submit.data:
+        if not form.validate():
+            error = copy(form.errors)
+            form.errors.clear()
+        elif form.submit.data:
+            # Submit button pressed
             database.Page(
                 id=page.id,  # So Peewee knows we want to do an UPDATE
-                title=form.page_title.data,
-                content=form.content.data,
-                css=form.custom_css.data,
-                url=form.url.data,
-                markdown=form.markdown.data
+                created=page.created,
+                **form.data_dict()
             ).save()
-            
-        # Preview button pressed
+            return redirect('pages/' + page.url)
         else:
+            # Preview button pressed
             preview = form.content.data
     
     return render_template(
         'pages/editor.html', 
         current_user = flask_login.current_user,
         form=form, 
+        error=error,
         preview=preview,
         target="/pages/edit/" + str(page_id)
     )
