@@ -3,7 +3,7 @@
 {% block title %}Pages{% endblock %}
 {% block page_title %}Pages{% endblock %}
 
-{% block content %}
+{% block more_content %}
     {% if error %}
     <h2>Error</h2>
     <ul>
@@ -24,9 +24,17 @@
         <label>
             Template: {{ form.template }}
         </label>
+
+        <label>
+            Date: {{ form.created }}
+        </label>
         
         <label>
             URL: {{ form.url }}
+        </label>
+
+        <label>
+            Tags: {{ form.tags }}
         </label>
         
         <label>

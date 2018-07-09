@@ -7,9 +7,17 @@
 {% endblock %}
 
 {% block title_class %}title-regular{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
 {% block page_title %}
     {{ post.title }}
     {% if current_user.is_authenticated %}
+    <span class="page-info">
+        Published: {{ post.created }}
+        {% if post.created != post.modified %}
+        &mdash;
+        Last Updated: {{ post.modified }}
+        {% endif %}
+    </span>
     <span style="float: right; font-size: 50%;">
         <a href="/blog/edit/{{ post.id }}">[edit]</a>
     </span>

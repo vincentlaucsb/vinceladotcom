@@ -1,4 +1,4 @@
-import flask_login
+from flask_login import login_required
 from flask import Blueprint, request, redirect
 from .forms import *
 from .. import database, markdown
@@ -11,7 +11,8 @@ def blog_list():
     posts = []
     drafts = []
     
-    for post in database.BlogPost.select():
+    for post in database.BlogPost.select().order_by(
+        database.BlogPost.created.desc()):
         if not post.draft:
             posts.append(post)
         else:
@@ -36,6 +37,7 @@ def blog_article(title):
     )
     
 @blog.route("/blog/edit/<int:post_id>", methods=['GET', 'POST'])
+@login_required
 def blog_edit(post_id):
     # Render article
     blog = database.BlogPost.get(database.BlogPost.id == post_id)
@@ -46,19 +48,21 @@ def blog_edit(post_id):
     # Form Attributes
     if request.method == 'GET':
         form.page_title.data = blog.title
+        form.created.data = blog.created
         form.content.data = blog.content
         form.draft.data = blog.draft
+        form.metadata.data = blog.meta
+        form.tags.data = blog.tags
     
     # Show a preview of the rendered Markdown
     elif request.method == 'POST':
     
-        # Submit button pressed
         if form.submit.data:
-            database.BlogPost(id=blog.id, author=current_user.full_name, created=blog.created, **form.data_dict()).save()
+            # Submit button pressed
+            database.BlogPost(id=blog.id, author=current_user.full_name, **form.data_dict()).save()
             return redirect('blog/' + blog.url())
-            
-        # Preview button pressed
         else:
+            # Preview button pressed
             preview = markdown.parse_markdown(form.content.data)
     
     return render_template(
@@ -70,6 +74,7 @@ def blog_edit(post_id):
     )
     
 @blog.route("/blog/new", methods=['GET', 'POST'])
+@login_required
 def blog_post():
     form = BlogForm(request.form)
     preview = ''
@@ -77,12 +82,11 @@ def blog_post():
     # Show a preview of the rendered Markdown
     if request.method == 'POST':
     
-        # Submit button pressed
         if form.submit.data:
+            # Submit button pressed
             database.BlogPost.create(author=current_user.full_name, **form.data_dict())
-            
-        # Preview button pressed
         else:
+            # Preview button pressed
             preview = markdown.parse_markdown(form.content.data)
     
     return render_template(

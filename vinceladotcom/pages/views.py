@@ -17,11 +17,10 @@ def page_list():
     drafts = []
     
     for post in database.Page.select():
-        posts.append(post)
-        #if post.draft:
-            
-        #else:
-            #drafts.append(post)
+        if post.draft:
+            posts.append(post)
+        else:
+            drafts.append(post)
             
     return render_template('pages/index.html', posts=posts, drafts=drafts)
         
@@ -49,18 +48,11 @@ def page_new():
     # Show a preview of the rendered HTML
     if request.method == 'POST':
     
-        # Submit button pressed
         if form.submit.data:
-            database.Page(
-                title=form.page_title.data,
-                css=form.custom_css.data,
-                url=form.url.data,
-                content=form.content.data,
-                markdown=form.markdown.data
-            ).save()
-            
-        # Preview button pressed
+            # Submit button pressed
+            database.Page(**form.data_dict()).save()
         else:
+            # Preview button pressed
             preview = form.content.data
     
     return render_template(
@@ -97,7 +89,6 @@ def page_edit(page_id):
             # Submit button pressed
             database.Page(
                 id=page.id,  # So Peewee knows we want to do an UPDATE
-                created=page.created,
                 **form.data_dict()
             ).save()
             return redirect('pages/' + page.url)

@@ -46,10 +46,40 @@
             float: right;
         }
     </style>
+
+    <!-- fullscreen.js -->
+    <style type="text/css">
+        .fullscreen {
+            background: gray;
+        }
+        
+        #fullscreen-popup {
+            position: fixed;
+            width: 100vw;
+            left: 0;
+            bottom: 0;
+            padding: 1em 0 1em 0;
+            display: block;
+            text-align: center;
+            background: #2b2b2b;
+            color: #cccccc;
+            z-index: 999;
+        }
+        
+        #fullscreen-popup.invisible {
+            display: none;
+        }
+    </style>
 {% endblock %}
 
 {% block title %}{% endblock %}
 {% block page_title %}{% endblock %}
 
 {% block content %}
+    <!-- Fullscreen on Ctrl + F11 -->
+    <script src="/static/js/vince.js/fullscreen/fullscreen.js" type="text/javascript"></script>
+    <div id="fullscreen-popup" class="invisible"></div>
+
+    {% block more_content %}
+    {% endblock %}
 {% endblock %}

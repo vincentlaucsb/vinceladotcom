@@ -18,7 +18,7 @@ class BaseModel(Model):
         
 class BasePage(BaseModel):
     title = CharField(200, unique=True)
-    tags = TextField(default='[]')
+    tags = TextField(default='')
     created = DateField(default=datetime.datetime.now)
     modified = DateField(default=datetime.datetime.now)
     deleted = BooleanField(default=False)
@@ -31,6 +31,14 @@ class BasePage(BaseModel):
             meta_data = json.loads(self.meta)
             for k, v in meta_data.items():
                 setattr(self, k, v)
+
+    def get_tags(self):
+        def strip_leading_space(_str):
+            if _str.startswith(' '):
+                _str = _str[1: ]
+            return _str
+
+        return [strip_leading_space(i) for i in self.tags.split(',')]
 
 class BlogPost(BasePage):
     author = CharField(200)

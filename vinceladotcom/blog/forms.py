@@ -9,7 +9,9 @@ class BlogForm(BaseForm):
         title = 'page_title',
         content = 'content',
         draft = 'draft',
-        meta = 'metadata' # Can't use meta because it's an instance attribute
+        created = 'created',
+        meta = 'metadata', # Can't use meta because it's an instance attribute
+        tags = 'tags'
     )
 
     content = AceTextField(mode='ace/mode/markdown')

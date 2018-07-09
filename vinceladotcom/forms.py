@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 
@@ -7,7 +8,7 @@ __all__ = [
 
 import markupsafe
 from wtforms import validators, ValidationError, Form, BooleanField, TextAreaField, \
-    TextField, SelectField, SubmitField, widgets, core
+    TextField, SelectField, SubmitField, widgets, core, DateField
 from .config import CURRENT_DIR
 
 def get_templates():
@@ -21,6 +22,8 @@ def get_templates():
 
 class BaseForm(Form):
     errors = []
+    created = DateField(default=datetime.datetime.now())
+    tags = TextField()
 
     def data_dict(self):
         ''' So instead of this:
@@ -52,7 +55,7 @@ class AceText(widgets.TextArea):
         text_area = super(AceText, self).__call__(field, **kwargs)
         return text_area + markupsafe.Markup('''
             <div id="{name}-editor" class="editor">&lt;h1&gt;Title&lt;/h1&gt;</div>
-            <script>
+            <script type="text/javascript">
                 var {name}_editor = ace.edit("{name}-editor");
                 {name}_editor.setTheme("ace/theme/monokai");
                 {name}_editor.session.setMode("{mode}");
@@ -66,14 +69,9 @@ class AceText(widgets.TextArea):
                     document.getElementById("{name}").value = {name}_editor.getValue();
                 }});
             </script>
-            
-            <a id="{name}_fs_trigger">Fullscreen Editor</a>
-            <script type="text/javascript" charset="utf-8">
-                const {name}_fs_target = document.getElementById("content-editor");
-                {name}_fs_trigger.onclick = function(delta) {{
-                    var temp = {name}_fs_target.className;
-                    {name}_fs_target.setAttribute("class", temp + " editor-fullscreen");
-                }};
+
+            <script type="text/javascript">
+                fullscreen.add(document.getElementById("{name}-editor"));
             </script>
         ''').format(
             name = field.name,
