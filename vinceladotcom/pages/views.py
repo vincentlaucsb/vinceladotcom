@@ -1,36 +1,41 @@
+import os
 from copy import copy
 
 from flask_login import login_required
 import flask_login
 
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request, redirect, jsonify
 from .forms import *
 from .. import database
-from ..config import render_template, PAGE_GLOBALS
+from ..config import CURRENT_DIR, render_template, PAGE_GLOBALS
+
+from jinja2 import Template
 
 page = Blueprint('page', __name__)
+
+with open(os.path.join(CURRENT_DIR, "templates/macros.html")) as macros:
+    MACROS = macros.read()
 
 @page.route("/pages/", methods=['GET'])
 @login_required
 def page_list():
-    posts = []
-    drafts = []
-    
-    for post in database.Page.select():
-        if post.draft:
-            posts.append(post)
-        else:
-            drafts.append(post)
-            
-    return render_template('pages/index.html', posts=posts, drafts=drafts)
+    posts = [i for i in database.Page.select()]
+   
+    return render_template('pages/index.html', posts=posts)
         
 @page.route("/pages/<title>", methods=['GET'])
 def page_view(title):
     ''' Render a page '''
+    
     page = database.Page.get(database.Page.url == title)
     template = page.template
     if not template:
         template = 'base_page.html'
+    
+    page.content = Template(page.content).render(
+        page=page,
+        **PAGE_GLOBALS
+    )
     
     return render_template(
         template,
@@ -47,19 +52,22 @@ def page_new():
     
     # Show a preview of the rendered HTML
     if request.method == 'POST':
-    
         if form.submit.data:
             # Submit button pressed
             database.Page(**form.data_dict()).save()
         else:
             # Preview button pressed
-            preview = form.content.data
+            preview = Template(MACROS + form.content.data).render(
+                page=form.data_dict(),
+                **PAGE_GLOBALS
+            )
     
     return render_template(
         'pages/editor.html',
         form=form,
         preview=preview,
-        target="/pages/new"
+        target="/pages/new",
+        page_globals = PAGE_GLOBALS
     )
 
 @page.route("/pages/edit/<int:page_id>", methods=['GET', 'POST'])
@@ -80,6 +88,7 @@ def page_edit(page_id):
         form.markdown.render_kw = { 'markdown': page.markdown }
         form.content.data = page.content
         form.metadata.data = page.meta
+        form.created.data = page.created
     
     elif request.method == 'POST':
         if not form.validate():
@@ -94,7 +103,8 @@ def page_edit(page_id):
             return redirect('pages/' + page.url)
         else:
             # Preview button pressed
-            preview = form.content.data
+            preview = Template(MACROS + page.content).render(page=page,
+                **PAGE_GLOBALS)
     
     return render_template(
         'pages/editor.html', 
@@ -102,8 +112,25 @@ def page_edit(page_id):
         form=form, 
         error=error,
         preview=preview,
-        target="/pages/edit/" + str(page_id)
+        target="/pages/edit/" + str(page_id),
+        page_globals = PAGE_GLOBALS
     )
+    
+@page.route("/pages/history/<int:page_id>", methods=['GET', 'POST'])
+def page_history(page_id):
+    past_revisions = database.PageRevisions.select().where(
+        database.PageRevisions.id == page_id
+    )
+    
+    return render_template(
+        'pages/history.html',
+        history = past_revisions
+    )
+    
+@page.route("/pages/edit/globals", methods=['GET', 'POST'])
+@login_required
+def page_globals():
+    return jsonify(PAGE_GLOBALS)
 
 @page.route("/pages/delete/<int:page_id>", methods=['GET', 'POST'])
 @login_required

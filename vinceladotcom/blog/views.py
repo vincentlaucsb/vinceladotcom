@@ -1,10 +1,16 @@
 from flask_login import login_required
 from flask import Blueprint, request, redirect
+from peewee import *
+
 from .forms import *
 from .. import database, markdown
 from ..config import render_template
 
 blog = Blueprint('blog', __name__)
+
+#################
+# Blog Controls
+#################
 
 @blog.route("/blog/", methods=['GET'])
 def blog_list():
@@ -20,7 +26,7 @@ def blog_list():
             
     return render_template('blog/index.html', posts=posts, drafts=drafts)
 
-@blog.route("/blog/<title>", methods=['GET'])
+@blog.route("/blog/<title>/", methods=['GET'])
 def blog_article(title):
     # Load list of BlogPosts
     if not database.BlogPost.urls:
@@ -96,3 +102,19 @@ def blog_post():
         preview=preview,
         target='/blog/new'
     )
+    
+########
+# Tags #
+########
+
+@blog.route("/blog/tags/<tag>", methods=['GET'])
+def tag_list(tag):
+    posts = []
+    
+    for post in database.BlogPost.select().where(
+        fn.has_tag(database.BlogPost.tags, tag)
+        ).order_by(
+        database.BlogPost.created.desc()):
+        posts.append(post)
+            
+    return render_template('blog/index.html', posts=posts)

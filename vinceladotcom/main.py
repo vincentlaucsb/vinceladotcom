@@ -7,6 +7,7 @@ from wtforms import validators, Form, FileField, SelectField, TextField, \
     TextAreaField, StringField, SubmitField
 from markupsafe import Markup, escape
     
+import requests
 import datetime
 import os
 from os import path
@@ -14,23 +15,42 @@ from os import path
 # My Libraries
 from .sitemap import Sitemap, SitemapEntry
 from .config import *
-from . import auth, markdown, database, blog, pages
+from . import auth, database, markdown, blog, pages
 
 import json
 
-''' Authentication '''
+# App config
+from .secret import SECRET_KEY
+DEBUG = True
+application = Flask(__name__, static_url_path='/static')
+application.config.from_object(__name__)
+application.config['SECRET_KEY'] = SECRET_KEY
 
+def init_db():
+    database.db.create_tables([
+        database.Users,
+        database.BlogPost,
+        database.Page,
+        database.BlogRevisions,
+        database.PageRevisions
+    ])
+
+init_db()
+application.register_blueprint(blog.views.blog)
+application.register_blueprint(pages.views.page)
+
+''' Authentication '''
 from flask_login import login_required
 import flask_login
 
 login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(application)
 
 @login_manager.user_loader
 def load_user(user_id):
     return database.Users.get(user_id)
     
-@app.route('/login', methods=['GET', 'POST'])
+@application.route('/login', methods=['GET', 'POST'])
 def login():
     form = auth.LoginForm(request.form)
     error = ""
@@ -56,7 +76,7 @@ def login():
         error=error
     )
     
-@app.route('/logout')
+@application.route('/logout')
 @login_required
 def logout():
     flask_login.logout_user()
@@ -66,21 +86,21 @@ def logout():
         message='You have been logged out.'
     )
     
-'''
-Beginning of App
-'''
+####################
+# Beginning of App #
+####################
 
-@app.route("/", methods=['GET'])
+@application.route("/", methods=['GET'])
 def index():
     return render_template('index.html')
     
-@app.route("/sitemap.xml", methods=['GET'])
+@application.route("/sitemap.xml", methods=['GET'])
 def sitemap():
     ''' Generate a sitemap.xml at the root '''
     
     _sitemap = Sitemap(request.url_root)
     
-    for i in app.url_map.iter_rules():
+    for i in application.url_map.iter_rules():
         url = str(i)
         
         entry = SitemapEntry()
@@ -105,18 +125,3 @@ def sitemap():
     response = flask.make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
     return response
-
-def init_db():
-    database.db.create_tables([
-        database.Users,
-        database.BlogPost,
-        database.Page
-    ])
-    
-def run():
-    # Create tables (if not exist)
-    init_db()
-        
-    app.register_blueprint(blog.views.blog)
-    app.register_blueprint(pages.views.page)
-    app.run(host='0.0.0.0')

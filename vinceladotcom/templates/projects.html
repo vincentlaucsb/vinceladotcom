@@ -1,13 +1,5 @@
 {% extends "base_page.html" %}
 
-{% macro proj(name, description, links) %}
-    <section>
-        <h3>{{ name }}</h3>
-        <p>{{ description}}</p>
-        <p>{{ links }}</p>
-    </section>
-{% endmacro %}
-
 {% block content %}
     {{ page.content|safe }}
 {% endblock %}

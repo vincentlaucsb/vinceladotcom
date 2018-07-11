@@ -5,28 +5,29 @@ import vinceladotcom as site
 
 @pytest.fixture
 def client():
-    db_file, site.app.config['DATABASE'] = tempfile.mkstemp()
-    site.app.config['TESTING'] = True
+    db_file, site.application.config['DATABASE'] = tempfile.mkstemp()
+    site.application.config['TESTING'] = True
     
-    with site.app.app_context():
+    with site.application.app_context():
         site.init_db()
         
         # Set up admin user
         site.auth.new_user(
             name='admin',
             password='password',
+            full_name='Admin Adminson',
             email='adminator@wh.gov',
             is_admin=True
         )
-        site.app.config['USERNAME'] = 'admin'
-        site.app.config['PASSWORD'] = 'password'
+        site.application.config['USERNAME'] = 'admin'
+        site.application.config['PASSWORD'] = 'password'
     
-    client = site.app.test_client()
+    client = site.application.test_client()
         
     yield client
     
     os.close(db_file)
-    os.unlink(site.app.config['DATABASE'])
+    os.unlink(site.application.config['DATABASE'])
 
 def login(client, username, password):
     return client.post('/login', data=dict(
@@ -42,8 +43,8 @@ def test_login_logout(client):
     
     rv = login(
         client, 
-        site.app.config['USERNAME'],
-        site.app.config['PASSWORD']
+        site.application.config['USERNAME'],
+        site.application.config['PASSWORD']
     )
     assert b'Hi, and welcome to my online home!' in rv.data
     

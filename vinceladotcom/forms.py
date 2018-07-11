@@ -43,7 +43,11 @@ class BaseForm(Form):
         ).save()
         '''
         
-        return { k: getattr(self, v).data for k, v in self.__class__.db_mapping.items() }
+        temp =  { k: getattr(self, v).data for k, v in self.__class__.db_mapping.items() }
+        
+        # Convert datetime objects to strings
+        temp['created'] = str(temp['created'])        
+        return temp
     
 class AceText(widgets.TextArea):
     ''' Custom widget for my ACE text editor hack '''

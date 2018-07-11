@@ -1,0 +1,10 @@
+{% extends "base_editor.html" %}
+
+{% block title %}Pages{% endblock %}
+{% block page_title %}Pages{% endblock %}
+
+{% block more_content %}
+    {% for i in history %}
+        {{ i.content }}
+    {% endfor %}
+{% endblock %}

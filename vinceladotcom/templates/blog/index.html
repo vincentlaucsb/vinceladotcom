@@ -31,7 +31,7 @@
         {% if post.get_tags() %}
         <p style="font-size: 0.9em;">Filed Under:
             {% for i in post.get_tags() %}
-                {{ i }}
+                <a href="/blog/tags/{{ i }}">{{ i }}</a>
             {% endfor %}
         </p>
         {% endif %}

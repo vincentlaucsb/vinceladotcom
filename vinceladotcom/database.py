@@ -1,11 +1,52 @@
 from peewee import *
 from playhouse.pool import PooledSqliteDatabase
+
 import datetime
 import json
 
-db = PooledSqliteDatabase(
-    database='vince.sqlite'
-)
+def has_tag(tag_list, tag):
+    ''' Parse the tag field of a page '''
+    
+    tag_list = tag_list.split(',')
+    for i in tag_list:
+        if i.startswith(' '):
+            i = i[1:]
+        
+        if i == tag:
+            return True
+    
+    return False
+
+db = PooledSqliteDatabase(database='vince.sqlite')
+db.register_function(has_tag, name='has_tag', num_params=2)
+
+##############################
+# Post/Page Revision History #
+##############################
+
+db.execute_sql('''
+    CREATE TRIGGER IF NOT EXISTS blog_revisions_ins
+    UPDATE OF content on blogpost
+        BEGIN
+            INSERT INTO blogrevisions VALUES(
+                old.id,
+                old.content,
+                old.modified
+            );
+        END;
+''')
+        
+db.execute_sql('''
+    CREATE TRIGGER IF NOT EXISTS page_revisions_ins
+    UPDATE OF content on page
+        BEGIN
+            INSERT INTO pagerevisions VALUES(
+                old.id,
+                old.content,
+                old.modified
+            );
+        END;
+''')
 
 def title_to_url(title):
     ret = title.lower()
@@ -16,11 +57,21 @@ class BaseModel(Model):
     class Meta:
         database = db
         
+class BaseRevision(Model):
+    ''' Base class for revision history models '''
+    id = IntegerField()
+    content = TextField()
+    modified = DateField()
+    
+    class Meta:
+        database = db
+        primary_key = False
+        
 class BasePage(BaseModel):
     title = CharField(200, unique=True)
     tags = TextField(default='')
-    created = DateField(default=datetime.datetime.now)
-    modified = DateField(default=datetime.datetime.now)
+    created = DateField(default=lambda: datetime.datetime.now())
+    modified = DateField(default=lambda: datetime.datetime.now())
     deleted = BooleanField(default=False)
     meta = TextField(default='')
     
@@ -60,6 +111,16 @@ class Page(BasePage):
     custom_css = TextField(default='')
     content = TextField()
     markdown = BooleanField(default=False)
+    
+class BlogRevisions(BaseRevision):
+    class Meta:
+        constraints = [SQL('''
+            FOREIGN KEY(id) REFERENCES blogpost(id) ON DELETE CASCADE''')]
+
+class PageRevisions(BaseRevision):
+    class Meta:
+        constraints = [SQL('''
+            FOREIGN KEY(id) REFERENCES page(id) ON DELETE CASCADE''')]
     
 class Users(BaseModel):
     name = CharField(200)

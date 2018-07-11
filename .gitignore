@@ -5,3 +5,6 @@ secret.py
 # Python
 .cache/
 *.pyc
+
+# Other Garbage
+github.json

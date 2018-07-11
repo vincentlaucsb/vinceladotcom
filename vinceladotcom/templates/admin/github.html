@@ -1,0 +1,25 @@
+{% extends "base_page.html" %}
+
+{% block more_head %}
+<!-- TODO: Clean up -->
+<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+{% endblock %}
+
+{% block title %}GitHub Repos{% endblock %}
+{% block page_title %}GitHub Repos{% endblock %}
+{% block content %}
+    {% for repo in repos %}
+        <h2>{{ repo.name }}</h2>
+        <a href="{{ repo.url }}">{{ repo.url }}</a>
+        
+        <p>
+        {{ repo.description }}
+        </p>
+        
+        <p>
+            Language: {{ repo.language }}
+            Stars: {{ repo.stargazers_count }}
+        </p>
+        
+    {% endfor %}
+{% endblock %}
