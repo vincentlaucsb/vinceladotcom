@@ -2,6 +2,7 @@ from flask import Flask
 from os import path
 import json
 import flask
+import requests
 
 CURRENT_DIR = path.dirname(path.realpath(__file__))
 STATIC_DIR = path.join(CURRENT_DIR, 'static')

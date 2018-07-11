@@ -21,7 +21,7 @@ import json
 
 # App config
 from .secret import SECRET_KEY
-DEBUG = True
+DEBUG = False
 application = Flask(__name__, static_url_path='/static')
 application.config.from_object(__name__)
 application.config['SECRET_KEY'] = SECRET_KEY
@@ -49,6 +49,10 @@ login_manager.init_app(application)
 @login_manager.user_loader
 def load_user(user_id):
     return database.Users.get(user_id)
+    
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return redirect('/login')
     
 @application.route('/login', methods=['GET', 'POST'])
 def login():

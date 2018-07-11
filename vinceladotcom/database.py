@@ -68,7 +68,6 @@ class BaseRevision(Model):
         primary_key = False
         
 class BasePage(BaseModel):
-    title = CharField(200, unique=True)
     tags = TextField(default='')
     created = DateField(default=lambda: datetime.datetime.now())
     modified = DateField(default=lambda: datetime.datetime.now())
@@ -92,6 +91,7 @@ class BasePage(BaseModel):
         return [strip_leading_space(i) for i in self.tags.split(',')]
 
 class BlogPost(BasePage):
+    title = CharField(200, unique=True)
     author = CharField(200)
     draft = BooleanField(default=True)
     content = TextField()
@@ -106,6 +106,7 @@ class BlogPost(BasePage):
         return title_to_url(self.title)
     
 class Page(BasePage):
+    title = CharField(200)
     url = TextField(unique=True)
     template = TextField(default='')
     custom_css = TextField(default='')

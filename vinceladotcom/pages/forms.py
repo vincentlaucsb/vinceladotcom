@@ -25,7 +25,8 @@ class PageForm(BaseForm):
         markdown = 'markdown',
         meta = 'metadata',
         created = 'created',
-        tags = 'tags'
+        tags = 'tags',
+        template = 'template'
     )
 
     content = AceTextField()

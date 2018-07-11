@@ -1,9 +1,11 @@
 import os
 from copy import copy
 
-from flask_login import login_required
 import flask_login
+import flask
+import peewee
 
+from flask_login import login_required
 from flask import Blueprint, request, redirect, jsonify
 from .forms import *
 from .. import database
@@ -23,25 +25,31 @@ def page_list():
    
     return render_template('pages/index.html', posts=posts)
         
-@page.route("/pages/<title>", methods=['GET'])
-def page_view(title):
+@page.route("/pages/<path:url>", methods=['GET'])
+def page_view(url):
     ''' Render a page '''
     
-    page = database.Page.get(database.Page.url == title)
-    template = page.template
-    if not template:
-        template = 'base_page.html'
-    
-    page.content = Template(page.content).render(
-        page=page,
-        **PAGE_GLOBALS
-    )
-    
-    return render_template(
-        template,
-        page = page,
-        **PAGE_GLOBALS
-    )
+    try:
+        page = database.Page.get(database.Page.url == url)
+        template = page.template
+        if not template:
+            template = 'base_page.html'
+        
+        page.content = Template(page.content).render(
+            page=page,
+            current_user=flask_login.current_user,
+            **PAGE_GLOBALS
+        )
+        
+        return render_template(
+            template,
+            page=page,
+            current_user=flask_login.current_user,
+            **PAGE_GLOBALS
+        )
+        
+    except peewee.DoesNotExist:
+        flask.abort(404)
         
 @page.route("/pages/new", methods=['GET', 'POST'])
 @login_required
@@ -59,12 +67,14 @@ def page_new():
             # Preview button pressed
             preview = Template(MACROS + form.content.data).render(
                 page=form.data_dict(),
+                current_user=flask_login.current_user,
                 **PAGE_GLOBALS
             )
     
     return render_template(
         'pages/editor.html',
         form=form,
+        current_user = flask_login.current_user,
         preview=preview,
         target="/pages/new",
         page_globals = PAGE_GLOBALS
@@ -83,12 +93,12 @@ def page_edit(page_id):
     if request.method == 'GET':
         # Form Attributes
         form.page_title.render_kw = { 'value': page.title }
-        form.template.render_kw = { 'value': page.template }
         form.url.render_kw = { 'value': page.url }
         form.markdown.render_kw = { 'markdown': page.markdown }
         form.content.data = page.content
         form.metadata.data = page.meta
         form.created.data = page.created
+        form.template.data = page.template
     
     elif request.method == 'POST':
         if not form.validate():
@@ -103,7 +113,8 @@ def page_edit(page_id):
             return redirect('pages/' + page.url)
         else:
             # Preview button pressed
-            preview = Template(MACROS + page.content).render(page=page,
+            preview = Template(MACROS + form.content.data).render(page=page,
+                current_user = flask_login.current_user,
                 **PAGE_GLOBALS)
     
     return render_template(
