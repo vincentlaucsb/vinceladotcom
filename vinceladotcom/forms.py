@@ -58,25 +58,54 @@ class AceText(widgets.TextArea):
     def __call__(self, field, **kwargs):
         text_area = super(AceText, self).__call__(field, **kwargs)
         return text_area + markupsafe.Markup('''
-            <div id="{name}-editor" class="editor">&lt;h1&gt;Title&lt;/h1&gt;</div>
-            <script type="text/javascript">
-                var {name}_editor = ace.edit("{name}-editor");
-                {name}_editor.setTheme("ace/theme/monokai");
-                {name}_editor.session.setMode("{mode}");
-                
-                <!-- Hack: Swap contents of content and ACE editor -->
-                var {name}_html_code = document.getElementById("{name}").value;
-                {name}_editor.setValue({name}_html_code);
-                {name}_editor.clearSelection();
-                
-                {name}_editor.session.on('change', function(delta) {{
-                    document.getElementById("{name}").value = {name}_editor.getValue();
-                }});
-            </script>
+        <div id="{name}-editor-wrapper" class="editor-wrapper">
+            <div class="editor-preview">
+                <div id="{name}-editor" class="editor">&lt;h1&gt;Title&lt;/h1&gt;</div>
+                <div id="{name}-preview-wrapper" class="preview">
+                    <iframe id="{name}-preview"></iframe>
+                </div>
+            </div>
+            <div class="editor-options">
+                <nav>
+                    <a id="{name}-fullscreen" class="fullscreen-trigger"></a>
+                    <a id="{name}-minimize" class="minimize-trigger"></a>
+                </nav>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            // Create ACE Editor
+            var {name}_editor = ace.edit("{name}-editor");
+            {name}_editor.setTheme("ace/theme/monokai");
+            {name}_editor.session.setMode("{mode}");
+            
+            // Hack: Swap contents of WTForms textarea and ACE editor
+            var {name}_html_code = document.getElementById("{name}").value;
+            {name}_editor.setValue({name}_html_code);
+            {name}_editor.clearSelection();
+            
+            {name}_editor.session.on('change', function(delta) {{
+                document.getElementById("{name}").value = {name}_editor.getValue();
+            }});
 
-            <script type="text/javascript">
-                fullscreen.add(document.getElementById("{name}-editor"));
-            </script>
+            // Create Live Preview
+            var preview = LiveHTMLPreview(
+                {name}_editor,
+                document.getElementById("{name}-preview")
+            );
+            
+            // Maximizer
+            var maximizer = Fullscreen(
+                document.getElementById("{name}-fullscreen"),
+                document.getElementById("{name}-editor-wrapper")
+            );
+            
+            // Minimizer
+            var minimizer = Minimizer(
+                document.getElementById("{name}-minimize"),
+                document.getElementById("{name}-preview-wrapper")
+            );
+        </script>
         ''').format(
             name = field.name,
             mode = kwargs['mode']
