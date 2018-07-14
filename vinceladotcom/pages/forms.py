@@ -29,7 +29,7 @@ class PageForm(BaseForm):
         template = 'template'
     )
 
-    content = AceTextField()
+    content = AceTextPreviewField()
     metadata = AceTextField()
     custom_css = TextAreaField()
     page_title = TextField('')

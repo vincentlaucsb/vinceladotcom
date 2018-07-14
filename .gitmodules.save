@@ -1,0 +1,6 @@
+	path = vinceladotcom/static/vince.js/ace-builds
+	url = https://github.com/ajaxorg/ace-builds.git
+
+[submodule "vince.js"]
+	path = vinceladotcom/static/vince.js
+	url = https://github.com/vincentlaucsb/vince.js.git

@@ -4,7 +4,10 @@
 
 {% block more_head %}
     <link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+    
+    <!-- ACE Editor -->
     <script src="/static/vince.js/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="/static/vince.js/js/fullscreen.js" type="text/javascript"></script>
     <script src="/static/vince.js/js/preview.js" type="text/javascript"></script>
     <script src="/static/vince.js/js/minimize.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="/static/vince.js/css/ace-preview.css">
@@ -27,6 +30,11 @@
         
         label {
             display: block;
+        }
+        
+        .editor {
+            min-width: 100%;
+            min-height: 50vh;
         }
         
         label input, label select {
