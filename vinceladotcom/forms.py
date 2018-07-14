@@ -131,12 +131,12 @@ class AceTextPreview(AceText):
                 function() {{
                     document.querySelector(
                         '#{name}-editor-wrapper .editor-options').classList.add(
-                        "fullscreen-options")
+                        "fullscreen-options");
                 }},
                 function() {{
                     document.querySelector(
                         '#{name}-editor-wrapper .editor-options').classList.remove(
-                        "fullscreen-options")
+                        "fullscreen-options");
                 }}
             );
             // Minimizer
