@@ -9,8 +9,6 @@ def client():
     site.application.config['TESTING'] = True
     
     with site.application.app_context():
-        site.init_db()
-        
         # Set up admin user
         site.auth.new_user(
             name='admin',

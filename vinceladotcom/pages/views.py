@@ -33,7 +33,7 @@ def page_view(url):
         page = database.Page.get(database.Page.url == url)
         template = page.template
         if not template:
-            template = 'base_page.html'
+            template = 'pages/page.html'
         
         page.content = Template(page.content).render(
             page=page,
@@ -96,7 +96,7 @@ def page_edit(page_id):
         form.url.render_kw = { 'value': page.url }
         form.markdown.render_kw = { 'markdown': page.markdown }
         form.content.data = page.content
-        form.metadata.data = page.meta
+        form.metadata.data = deserialize_metadata(page.meta)
         form.created.data = page.created
         form.template.data = page.template
     

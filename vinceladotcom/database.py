@@ -20,34 +20,6 @@ def has_tag(tag_list, tag):
 db = PooledSqliteDatabase(database='vince.sqlite')
 db.register_function(has_tag, name='has_tag', num_params=2)
 
-##############################
-# Post/Page Revision History #
-##############################
-
-db.execute_sql('''
-    CREATE TRIGGER IF NOT EXISTS blog_revisions_ins
-    UPDATE OF content on blogpost
-        BEGIN
-            INSERT INTO blogrevisions VALUES(
-                old.id,
-                old.content,
-                old.modified
-            );
-        END;
-''')
-        
-db.execute_sql('''
-    CREATE TRIGGER IF NOT EXISTS page_revisions_ins
-    UPDATE OF content on page
-        BEGIN
-            INSERT INTO pagerevisions VALUES(
-                old.id,
-                old.content,
-                old.modified
-            );
-        END;
-''')
-
 def title_to_url(title):
     ret = title.lower()
     ret = ret.replace(' ', '-')
@@ -79,6 +51,8 @@ class BasePage(BaseModel):
         
         if self.meta:
             meta_data = json.loads(self.meta)
+            self.meta_parsed = meta_data
+            
             for k, v in meta_data.items():
                 setattr(self, k, v)
 
@@ -141,3 +115,43 @@ class Users(BaseModel):
     
     def is_active(self):
         return True
+
+#################
+# Create Tables #
+#################
+
+db.create_tables([
+    Users,
+    BlogPost,
+    Page,
+    BlogRevisions,
+    PageRevisions
+])
+
+##############################
+# Post/Page Revision History #
+##############################
+
+db.execute_sql('''
+    CREATE TRIGGER IF NOT EXISTS blog_revisions_ins
+    UPDATE OF content on blogpost
+        BEGIN
+            INSERT INTO blogrevisions VALUES(
+                old.id,
+                old.content,
+                old.modified
+            );
+        END;
+''')
+        
+db.execute_sql('''
+    CREATE TRIGGER IF NOT EXISTS page_revisions_ins
+    UPDATE OF content on page
+        BEGIN
+            INSERT INTO pagerevisions VALUES(
+                old.id,
+                old.content,
+                old.modified
+            );
+        END;
+''')

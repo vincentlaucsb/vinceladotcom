@@ -15,7 +15,7 @@ from os import path
 # My Libraries
 from .sitemap import Sitemap, SitemapEntry
 from .config import *
-from . import auth, database, markdown, blog, pages
+from . import database
 
 import json
 
@@ -26,16 +26,7 @@ application = Flask(__name__, static_url_path='/static')
 application.config.from_object(__name__)
 application.config['SECRET_KEY'] = SECRET_KEY
 
-def init_db():
-    database.db.create_tables([
-        database.Users,
-        database.BlogPost,
-        database.Page,
-        database.BlogRevisions,
-        database.PageRevisions
-    ])
-
-init_db()
+from . import auth, blog, pages
 application.register_blueprint(blog.views.blog)
 application.register_blueprint(pages.views.page)
 

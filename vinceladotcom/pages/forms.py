@@ -15,8 +15,40 @@ def get_templates():
             
     return templates
 
-def parse_metadata():
+def parse_metadata(data):
+    '''
+    Given colon delimited lines of key-value pairs, return 
+    a JSON representation
+    '''
     
+    temp = {}
+    for row in data.split('\n'):
+        try:
+            k, v = row.split(':')
+        except ValueError:
+            # More than 2 colons
+            splitted = row.split(':')
+            k = ':'.join(splitted[:-1])
+            v = splitted[-1]
+        
+        # Remove carriage return
+        v = v.replace('\r', '')
+        
+        # Strip leading space
+        if v.startswith(' '):
+            temp[k] = v[1:]
+        else:
+            temp[k] = v
+
+    return json.dumps(temp)
+    
+def deserialize_metadata(_json):
+    ''' Deserialize metadata '''
+    
+    temp = ''
+    for k, v in json.loads(_json).items():
+        temp += '{}: {}\n'.format(k, v)
+    return temp
     
 class PageForm(BaseForm):
     # Mapping of database column names to form names
@@ -39,7 +71,7 @@ class PageForm(BaseForm):
     url = TextField()
     template = SelectField(
         'Template',
-        choices=[ (i, i) for i in get_templates() ]
+        choices=[ ('', '') ] +[ (i, i) for i in get_templates() ]
     )
     submit = SubmitField()
     preview = SubmitField()
@@ -48,12 +80,13 @@ class PageForm(BaseForm):
     def data_dict(self):
         ''' Parse metadata '''
         data = super(PageForm, self).data_dict()
+        data['meta'] = parse_metadata(data['meta'])
         return data
     
     def validate_metadata(form, field):
         try:
             if field.data:
-                json.loads(field.data)
+                parse_metadata(field.data)
         except:
-            form.errors.append("Invalid JSON in field metadata")
+            form.errors.append("Invalid metadata")
             raise ValidationError()

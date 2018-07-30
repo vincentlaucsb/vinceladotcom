@@ -6,6 +6,7 @@
     <meta charset="utf-8" />
     <meta name="author" content="Vincent La">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block metadata %}{% endblock %}
     {% endblock head %}
         
     <!-- Custom Fonts -->
@@ -34,9 +35,9 @@
     <header id="navbar-top" class="header-fixed">
         <h1><a href="/"><span id="vincent">Vincent</span> La</a></h1>
         <nav>
-            {% for link in main_menu %}
-                <a href="{{ link[1] }}">{{ link[0] }}</a>
-            {% endfor %}
+        {% for link in main_menu %}
+            <a href="{{ link[1] }}">{{ link[0] }}</a>
+        {% endfor %}
         </nav>
     </header>
 

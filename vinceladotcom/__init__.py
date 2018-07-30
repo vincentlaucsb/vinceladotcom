@@ -1,2 +1,1 @@
-from . import pages
-from .main import *
+from .main import application
