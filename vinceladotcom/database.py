@@ -16,7 +16,7 @@ def has_tag(tag_list, tag):
             return True
     
     return False
-
+   
 db = PooledSqliteDatabase(database='vince.sqlite')
 db.register_function(has_tag, name='has_tag', num_params=2)
 

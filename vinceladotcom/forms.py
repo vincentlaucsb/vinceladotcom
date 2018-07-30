@@ -26,27 +26,28 @@ class BaseForm(Form):
     tags = TextField()
 
     def data_dict(self):
-        ''' So instead of this:
-        database.Page(
+        '''
+        So instead of this:
+            database.Page(
                     id=page.id,  # So Peewee knows we want to do an UPDATE
                     title=form.page_title.data,
                     content=form.content.data,
                     css=form.custom_css.data,
                     url=form.url.data,
                     markdown=form.markdown.data
-                ).save()
+            ).save()
                 
         We can do this:
-        database.Page(
-            id=page.id,
-            **form.data_dict()            
-        ).save()
+            database.Page(
+                id=page.id,
+                **form.data_dict()            
+            ).save()
         '''
         
         temp =  { k: getattr(self, v).data for k, v in self.__class__.db_mapping.items() }
         
         # Convert datetime objects to strings
-        temp['created'] = str(temp['created'])        
+        temp['created'] = str(temp['created'])
         return temp
     
 class AceText(widgets.TextArea):

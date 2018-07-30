@@ -15,6 +15,9 @@ def get_templates():
             
     return templates
 
+def parse_metadata():
+    
+    
 class PageForm(BaseForm):
     # Mapping of database column names to form names
     db_mapping = dict(
@@ -41,6 +44,11 @@ class PageForm(BaseForm):
     submit = SubmitField()
     preview = SubmitField()
     markdown = BooleanField(default=False)
+    
+    def data_dict(self):
+        ''' Parse metadata '''
+        data = super(PageForm, self).data_dict()
+        return data
     
     def validate_metadata(form, field):
         try:

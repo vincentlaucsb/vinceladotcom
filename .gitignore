@@ -4,6 +4,7 @@ secret.py
 
 # Python
 .cache/
+.pytest_cache/
 *.pyc
 
 # Other Garbage
