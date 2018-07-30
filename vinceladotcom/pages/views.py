@@ -15,9 +15,6 @@ from jinja2 import Template
 
 page = Blueprint('page', __name__)
 
-with open(os.path.join(CURRENT_DIR, "templates/macros.html")) as macros:
-    MACROS = macros.read()
-
 @page.route("/pages/", methods=['GET'])
 @login_required
 def page_list():
@@ -65,7 +62,7 @@ def page_new():
             database.Page(**form.data_dict()).save()
         else:
             # Preview button pressed
-            preview = Template(MACROS + form.content.data).render(
+            preview = Template(form.content.data).render(
                 page=form.data_dict(),
                 current_user=flask_login.current_user,
                 **PAGE_GLOBALS
@@ -113,7 +110,7 @@ def page_edit(page_id):
             return redirect('pages/' + page.url)
         else:
             # Preview button pressed
-            preview = Template(MACROS + form.content.data).render(page=page,
+            preview = Template(form.content.data).render(page=page,
                 current_user = flask_login.current_user,
                 **PAGE_GLOBALS)
     
