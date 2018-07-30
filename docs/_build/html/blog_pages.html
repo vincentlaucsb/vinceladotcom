@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,15 +6,17 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Index &#8212; vinceladotcom 1.0.0 documentation</title>
+    <title>Blog Posts and (Mostly) Static Pages &#8212; vinceladotcom 1.0.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Forms (in-depth)" href="forms.html" />
+    <link rel="prev" title="Authentication" href="auth.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,11 +33,26 @@
 
           <div class="body" role="main">
             
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <div class="section" id="blog-posts-and-mostly-static-pages">
+<h1>Blog Posts and (Mostly) Static Pages<a class="headerlink" href="#blog-posts-and-mostly-static-pages" title="Permalink to this headline">¶</a></h1>
+<p>Blogging and pages are implemented as separate Blueprints. However, they share many components in common.</p>
+<div class="section" id="forms">
+<h2>Forms<a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h2>
+<p>This app defines additional custom fields in addition to the forms provided by WTForms which wrap the JavaScript-powered
+ACE text editor. The AceText widget merely consists of a basic ACE text editor, while the AceTextPreview widget adds an
+automatic updating preview.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forms.html">Forms (in-depth)</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="revision-history">
+<h2>Revision History<a class="headerlink" href="#revision-history" title="Permalink to this headline">¶</a></h2>
+<p>The SQLite database contains the tables <cite>blogrevisions</cite> and <cite>pagerevisions</cite> which contain all
+past versions of blogs and pages respectively. These tables are automatically maintained by insert
+triggers.</p>
+</div>
 </div>
 
 
@@ -59,8 +75,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="auth.html">Authentication</a></li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="blog_pages.html">Blog Posts and (Mostly) Static Pages</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Blog Posts and (Mostly) Static Pages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="forms.html">Forms (in-depth)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#revision-history">Revision History</a></li>
+</ul>
+</li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="sitemap.html">Sitemap Generator</a></li>
@@ -73,6 +96,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="auth.html" title="previous chapter">Authentication</a></li>
+      <li>Next: <a href="forms.html" title="next chapter">Forms (in-depth)</a></li>
   </ul></li>
 </ul>
 </div>
@@ -99,6 +124,9 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
       
+      |
+      <a href="_sources/blog_pages.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
 
     

@@ -104,6 +104,11 @@ def sitemap():
     
     _sitemap = Sitemap(request.url_root)
     
+    # Add US Commutes Times Map
+    usa = SitemapEntry()
+    usa['loc'] = 'usa/'
+    _sitemap.add(usa)
+    
     for i in application.url_map.iter_rules():
         url = str(i)
         

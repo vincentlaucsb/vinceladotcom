@@ -133,7 +133,7 @@ class Users(BaseModel):
     def __init__(self, *args, **kwargs):
         super(BaseModel, self).__init__(*args, **kwargs)
         
-        # This object is only returned on succesful authentication attempts
+        # This object is only returned on successful authentication attempts
         self.is_authenticated = True
         
     def is_active(self):

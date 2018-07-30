@@ -2,6 +2,7 @@ class Sitemap(object):
     ''' Sitemap generator '''
     
     def __init__(self, url_root):
+        ''' url_root: A string that gets prepended to every (relative) URL in self.entries '''
         super(Sitemap, self).__init__()
         self.entries = []
         self.url_root = url_root
@@ -11,6 +12,7 @@ class Sitemap(object):
         self.entries.append(entry)
     
     def __str__(self):
+        ''' Generate an XML string '''
         entries = ''
         
         for i in self.entries:
@@ -19,6 +21,8 @@ class Sitemap(object):
         return entries
 
 class SitemapEntry(dict):
+    ''' Used for storing the XML keys and attributes for each unique URL '''
+    
     def __init__(self, *args, **kwargs):
         super(SitemapEntry, self).__init__(*args, **kwargs)
         

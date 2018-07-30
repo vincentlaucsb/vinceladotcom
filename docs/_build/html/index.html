@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Welcome to vinceladotcom’s documentation! &#8212; vinceladotcom 1.0.0 documentation</title>
+    <title>vinceladotcom Website Architecture &#8212; vinceladotcom 1.0.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,6 +15,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Authentication" href="auth.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -31,180 +32,68 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-vinceladotcom-s-documentation">
-<h1>Welcome to vinceladotcom’s documentation!<a class="headerlink" href="#welcome-to-vinceladotcom-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="vinceladotcom-website-architecture">
+<h1>vinceladotcom Website Architecture<a class="headerlink" href="#vinceladotcom-website-architecture" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">json</span>
-
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;get_templates&quot;</span><span class="p">,</span> <span class="s2">&quot;BaseForm&quot;</span><span class="p">,</span> <span class="s2">&quot;AceTextField&quot;</span><span class="p">,</span> <span class="s2">&quot;AceTextPreviewField&quot;</span>
-<span class="p">]</span>
-
-<span class="kn">import</span> <span class="nn">markupsafe</span>
-<span class="kn">from</span> <span class="nn">wtforms</span> <span class="k">import</span> <span class="n">validators</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="n">Form</span><span class="p">,</span> <span class="n">BooleanField</span><span class="p">,</span> <span class="n">TextAreaField</span><span class="p">,</span> \
-    <span class="n">TextField</span><span class="p">,</span> <span class="n">SelectField</span><span class="p">,</span> <span class="n">SubmitField</span><span class="p">,</span> <span class="n">widgets</span><span class="p">,</span> <span class="n">core</span><span class="p">,</span> <span class="n">DateField</span>
-<span class="kn">from</span> <span class="nn">.config</span> <span class="k">import</span> <span class="n">CURRENT_DIR</span>
-
-<span class="k">def</span> <span class="nf">get_templates</span><span class="p">():</span>
-    <span class="n">templates</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CURRENT_DIR</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">)):</span>
-        <span class="n">current_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CURRENT_DIR</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">current_file</span><span class="p">)):</span>
-            <span class="n">templates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            
-    <span class="k">return</span> <span class="n">templates</span>
-
-<span class="k">class</span> <span class="nc">BaseForm</span><span class="p">(</span><span class="n">Form</span><span class="p">):</span>
-    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">created</span> <span class="o">=</span> <span class="n">DateField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
-    <span class="n">tags</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">data_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; So instead of this:</span>
-<span class="sd">        database.Page(</span>
-<span class="sd">                    id=page.id,  # So Peewee knows we want to do an UPDATE</span>
-<span class="sd">                    title=form.page_title.data,</span>
-<span class="sd">                    content=form.content.data,</span>
-<span class="sd">                    css=form.custom_css.data,</span>
-<span class="sd">                    url=form.url.data,</span>
-<span class="sd">                    markdown=form.markdown.data</span>
-<span class="sd">                ).save()</span>
-<span class="sd">                </span>
-<span class="sd">        We can do this:</span>
-<span class="sd">        database.Page(</span>
-<span class="sd">            id=page.id,</span>
-<span class="sd">            **form.data_dict()            </span>
-<span class="sd">        ).save()</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="n">temp</span> <span class="o">=</span>  <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">db_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">}</span>
-        
-        <span class="c1"># Convert datetime objects to strings</span>
-        <span class="n">temp</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">])</span>        
-        <span class="k">return</span> <span class="n">temp</span>
-    
-<span class="k">class</span> <span class="nc">AceText</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">TextArea</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Custom widget for my ACE text editor hack &#39;&#39;&#39;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AceText</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_hack_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        JavaScript hack which loads the contents of the ACE editor onto a </span>
-<span class="sd">        textarea that WTForms can process</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="k">return</span> <span class="n">markupsafe</span><span class="o">.</span><span class="n">Markup</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">            &lt;script type=&quot;text/javascript&quot;&gt;</span>
-<span class="s1">                // Create ACE Editor</span>
-<span class="s1">                var </span><span class="si">{name}</span><span class="s1">_editor = ace.edit(&quot;</span><span class="si">{name}</span><span class="s1">-editor&quot;);</span>
-<span class="s1">                </span><span class="si">{name}</span><span class="s1">_editor.setTheme(&quot;ace/theme/monokai&quot;);</span>
-<span class="s1">                </span><span class="si">{name}</span><span class="s1">_editor.session.setMode(&quot;</span><span class="si">{mode}</span><span class="s1">&quot;);</span>
-<span class="s1">                </span>
-<span class="s1">                // Hack: Swap contents of WTForms textarea and ACE editor</span>
-<span class="s1">                var </span><span class="si">{name}</span><span class="s1">_html_code = document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">&quot;).value;</span>
-<span class="s1">                </span><span class="si">{name}</span><span class="s1">_editor.setValue(</span><span class="si">{name}</span><span class="s1">_html_code);</span>
-<span class="s1">                </span><span class="si">{name}</span><span class="s1">_editor.clearSelection();</span>
-<span class="s1">                </span><span class="si">{name}</span><span class="s1">_editor.session.on(&#39;change&#39;, function(delta) {{</span>
-<span class="s1">                    document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">&quot;).value = </span><span class="si">{name}</span><span class="s1">_editor.getValue();</span>
-<span class="s1">                }});</span>
-<span class="s1">             &lt;/script&gt;</span>
-<span class="s1">         &#39;&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">text_area</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AceText</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">fmt_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
-        <span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">text_area</span> <span class="o">+</span> <span class="n">markupsafe</span><span class="o">.</span><span class="n">Markup</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">            &lt;div id=&quot;</span><span class="si">{name}</span><span class="s1">-editor&quot; class=&quot;editor&quot;&gt;&amp;lt;h1&amp;gt;Title&amp;lt;/h1&amp;gt;&lt;/div&gt;</span>
-<span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hack_script</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
-        <span class="p">)</span>
-        
-<span class="k">class</span> <span class="nc">AceTextPreview</span><span class="p">(</span><span class="n">AceText</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; ACE Text Editor with auto-updating preview &#39;&#39;&#39;</span>
-    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AceTextPreview</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">text_area</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AceText</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">text_area</span> <span class="o">+</span> <span class="n">markupsafe</span><span class="o">.</span><span class="n">Markup</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">        &lt;div id=&quot;</span><span class="si">{name}</span><span class="s1">-editor-wrapper&quot; class=&quot;editor-wrapper&quot;&gt;</span>
-<span class="s1">            &lt;div class=&quot;editor-preview&quot;&gt;</span>
-<span class="s1">                &lt;div id=&quot;</span><span class="si">{name}</span><span class="s1">-editor&quot; class=&quot;editor&quot;&gt;&amp;lt;h1&amp;gt;Title&amp;lt;/h1&amp;gt;&lt;/div&gt;</span>
-<span class="s1">                &lt;div id=&quot;</span><span class="si">{name}</span><span class="s1">-preview-wrapper&quot; class=&quot;preview&quot;&gt;</span>
-<span class="s1">                    &lt;iframe id=&quot;</span><span class="si">{name}</span><span class="s1">-preview&quot;&gt;&lt;/iframe&gt;</span>
-<span class="s1">                &lt;/div&gt;</span>
-<span class="s1">            &lt;/div&gt;</span>
-<span class="s1">            &lt;div class=&quot;editor-options&quot;&gt;</span>
-<span class="s1">                &lt;nav&gt;</span>
-<span class="s1">                    &lt;button id=&quot;</span><span class="si">{name}</span><span class="s1">-fullscreen&quot; type=&quot;button&quot; class=&quot;fullscreen-trigger&quot;&gt;Fullscreen&lt;/button&gt;</span>
-<span class="s1">                    &lt;button id=&quot;</span><span class="si">{name}</span><span class="s1">-minimize&quot; type=&quot;button&quot; class=&quot;minimize-trigger&quot;&gt;&lt;/button&gt;</span>
-<span class="s1">                &lt;/nav&gt;</span>
-<span class="s1">            &lt;/div&gt;</span>
-<span class="s1">        &lt;/div&gt;</span>
-<span class="s1">        </span>
-<span class="s1">        </span><span class="si">{hack}</span><span class="s1"></span>
-
-<span class="s1">         &lt;script type=&quot;text/javascript&quot;&gt;</span>
-<span class="s1">            // Create Live Preview</span>
-<span class="s1">            var preview = LiveHTMLPreview(</span>
-<span class="s1">                </span><span class="si">{name}</span><span class="s1">_editor,</span>
-<span class="s1">                document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">-preview&quot;)</span>
-<span class="s1">            );</span>
-<span class="s1">            </span>
-<span class="s1">            // Fullscreen Toggler</span>
-<span class="s1">            var maximizer = Fullscreen(</span>
-<span class="s1">                document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">-fullscreen&quot;),      // Trigger</span>
-<span class="s1">                document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">-editor-wrapper&quot;),  // Target</span>
-<span class="s1">                function() {{</span>
-<span class="s1">                    document.querySelector(</span>
-<span class="s1">                        &#39;#</span><span class="si">{name}</span><span class="s1">-editor-wrapper .editor-options&#39;).classList.add(</span>
-<span class="s1">                        &quot;fullscreen-options&quot;);</span>
-<span class="s1">                }},</span>
-<span class="s1">                function() {{</span>
-<span class="s1">                    document.querySelector(</span>
-<span class="s1">                        &#39;#</span><span class="si">{name}</span><span class="s1">-editor-wrapper .editor-options&#39;).classList.remove(</span>
-<span class="s1">                        &quot;fullscreen-options&quot;);</span>
-<span class="s1">                }}</span>
-<span class="s1">            );</span>
-<span class="s1">            // Minimizer</span>
-<span class="s1">            var minimizer = Minimizer(</span>
-<span class="s1">                document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">-minimize&quot;),</span>
-<span class="s1">                document.getElementById(&quot;</span><span class="si">{name}</span><span class="s1">-preview-wrapper&quot;)</span>
-<span class="s1">            );</span>
-<span class="s1">        &lt;/script&gt;</span>
-<span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">hack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hack_script</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]),</span>
-            <span class="n">mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
-        <span class="p">)</span>
-    
-    
-<span class="k">class</span> <span class="nc">AceTextField</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">StringField</span><span class="p">):</span>
-    <span class="n">widget</span> <span class="o">=</span> <span class="n">AceText</span><span class="p">()</span>
-    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;ace/mode/html&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;render_kw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span>
-        <span class="p">}</span>
-        
-        <span class="nb">super</span><span class="p">(</span><span class="n">AceTextField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">AceTextPreviewField</span><span class="p">(</span><span class="n">AceTextField</span><span class="p">):</span>
-    <span class="n">widget</span> <span class="o">=</span> <span class="n">AceTextPreview</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AceTextPreviewField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="github">
+<h2>GitHub<a class="headerlink" href="#github" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/vincentlaucsb/vinceladotcom">https://github.com/vincentlaucsb/vinceladotcom</a></p>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>These were mainly written as notes to myself in case I forgot how my own website worked. However, they
+can also serve as a reference for anybody else interested in building a Flask web app.</p>
+</div>
+<div class="section" id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Permalink to this headline">¶</a></h2>
+<p>My website has several components:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auth.html">Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#passlib">passlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#flask-login">flask-login</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="blog_pages.html">Blog Posts and (Mostly) Static Pages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="blog_pages.html#forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="forms.html">Forms (in-depth)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="blog_pages.html#revision-history">Revision History</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sitemap.html">Sitemap Generator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sitemap.html#populating-the-sitemap">Populating the Sitemap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sitemap.html#the-sitemap-class">The Sitemap Class</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="sqlite">
+<h2>SQLite<a class="headerlink" href="#sqlite" title="Permalink to this headline">¶</a></h2>
+<p>Currently, SQLite is used as the database backend. In order to swap out SQLite for another database engine, one would have to rewrite the triggers which create blog/page revision histories.</p>
+</div>
+<div class="section" id="deployment">
+<h2>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nginx.html">Nginx + uWSGI Deployment Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nginx.html#nginx-server-configuration">nginx Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nginx.html#uwsgi-notes">uWSGI Notes</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -233,11 +122,24 @@
 
 
 <h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auth.html">Authentication</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="blog_pages.html">Blog Posts and (Mostly) Static Pages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sitemap.html">Sitemap Generator</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nginx.html">Nginx + uWSGI Deployment Notes</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="auth.html" title="next chapter">Authentication</a></li>
   </ul></li>
 </ul>
 </div>
