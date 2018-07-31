@@ -4,7 +4,7 @@ import pytest
 import vinceladotcom as site
 
 @pytest.fixture
-def client():
+def client(request):
     db_file, site.application.config['DATABASE'] = tempfile.mkstemp()
     site.application.config['TESTING'] = True
     
@@ -32,6 +32,15 @@ def login(client, username, password):
         name=username,
         password=password
     ), follow_redirects=True)
+    
+@pytest.fixture
+def admin_client(client):
+    client.post('/login', data=dict(
+        name=site.application.config['USERNAME'],
+        password=site.application.config['PASSWORD']
+    ), follow_redirects=True)
+    
+    yield client
 
 def logout(client):
     return client.get('/logout', follow_redirects=True)
@@ -40,7 +49,7 @@ def test_login_logout(client):
     ''' Test logging in and logging out '''
     
     rv = login(
-        client, 
+        client,
         site.application.config['USERNAME'],
         site.application.config['PASSWORD']
     )
