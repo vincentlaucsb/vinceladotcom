@@ -46,8 +46,13 @@ def deserialize_metadata(_json):
     ''' Deserialize metadata '''
     
     temp = ''
-    for k, v in json.loads(_json).items():
-        temp += '{}: {}\n'.format(k, v)
+    
+    try:
+        for k, v in json.loads(_json).items():
+            temp += '{}: {}\n'.format(k, v)
+    except json.decoder.JSONDecodeError:
+        pass
+    
     return temp
     
 class PageForm(BaseForm):
