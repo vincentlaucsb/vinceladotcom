@@ -3,12 +3,17 @@ import tempfile
 import pytest
 import vinceladotcom as site
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def client(request):
-    db_file, site.application.config['DATABASE'] = tempfile.mkstemp()
-    site.application.config['TESTING'] = True
+    print("Setting up")
+    application = site.application
+    application.config['TESTING'] = True
+    db_file, application.config['DATABASE'] = tempfile.mkstemp()
     
-    with site.application.app_context():
+    from vinceladotcom.database import db_init
+    db_init()
+
+    with application.app_context():
         # Set up admin user
         site.auth.new_user(
             name='admin',
@@ -17,42 +22,41 @@ def client(request):
             email='adminator@wh.gov',
             is_admin=True
         )
-        site.application.config['USERNAME'] = 'admin'
-        site.application.config['PASSWORD'] = 'password'
+        application.config['USERNAME'] = 'admin'
+        application.config['PASSWORD'] = 'password'
     
-    client = site.application.test_client()
-        
-    yield client
-    
-    os.close(db_file)
-    os.unlink(site.application.config['DATABASE'])
+    client = application.test_client()
 
-def login(client, username, password):
-    return client.post('/login', data=dict(
+    def close():
+        print("Closing")
+        site.database.db.close()
+        os.close(db_file)
+        os.unlink(application.config['DATABASE'])
+
+    request.addfinalizer(close)
+
+    return client
+
+def login(test_client, username, password):
+    return test_client.post('/login', data=dict(
         name=username,
         password=password
     ), follow_redirects=True)
     
-@pytest.fixture
+@pytest.fixture(scope='function')
 def admin_client(client):
-    client.post('/login', data=dict(
-        name=site.application.config['USERNAME'],
-        password=site.application.config['PASSWORD']
-    ), follow_redirects=True)
-    
-    yield client
+    login(client, 'admin', 'password')
+    return client
 
-def logout(client):
-    return client.get('/logout', follow_redirects=True)
-    
+def logout(test_client):
+    return test_client.get('/logout', follow_redirects=True)
+
 def test_login_logout(client):
     ''' Test logging in and logging out '''
     
-    rv = login(
-        client,
-        site.application.config['USERNAME'],
-        site.application.config['PASSWORD']
-    )
+    rv = login(client,
+              site.application.config['USERNAME'],
+              site.application.config['PASSWORD'])
     assert b'Hi, and welcome to my online home!' in rv.data
     
     rv = logout(client)

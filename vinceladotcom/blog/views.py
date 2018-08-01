@@ -3,7 +3,7 @@ from flask import Blueprint, request, redirect
 from peewee import *
 
 from .forms import *
-from .. import database, markdown
+from .. import markdown
 from ..config import render_template
 
 blog = Blueprint('blog', __name__)
@@ -14,6 +14,7 @@ blog = Blueprint('blog', __name__)
 
 @blog.route("/blog/", methods=['GET'])
 def blog_list():
+    from .. import database
     posts = []
     drafts = []
     
@@ -28,14 +29,11 @@ def blog_list():
 
 @blog.route("/blog/<title>/", methods=['GET'])
 def blog_article(title):
-    # Load list of BlogPosts
-    if not database.BlogPost.urls:
-        for i in database.BlogPost.select():
-            pass
-    
-    # Render article
-    article_id = database.BlogPost.urls[title]
-    article = database.BlogPost.get(database.BlogPost.id == article_id)
+    from .. import database
+
+    article = database.BlogPost.get(fn.title_to_url(
+        database.BlogPost.title) == title)
+
     return render_template(
         'blog/post.html',
         post=article,
@@ -45,6 +43,7 @@ def blog_article(title):
 @blog.route("/blog/edit/<int:post_id>", methods=['GET', 'POST'])
 @login_required
 def blog_edit(post_id):
+    from .. import database
     # Render article
     blog = database.BlogPost.get(database.BlogPost.id == post_id)
     form = BlogForm(request.form)
@@ -82,6 +81,7 @@ def blog_edit(post_id):
 @blog.route("/blog/new", methods=['GET', 'POST'])
 @login_required
 def blog_post():
+    from .. import database
     form = BlogForm(request.form)
     preview = ''
     
@@ -109,6 +109,7 @@ def blog_post():
 
 @blog.route("/blog/tags/<tag>", methods=['GET'])
 def tag_list(tag):
+    from .. import database
     posts = []
     
     for post in database.BlogPost.select().where(

@@ -3,9 +3,13 @@ secret.py
 *.sqlite
 
 # Python
-.cache/
-.pytest_cache/
 *.pyc
 
+# Testing
+.cache/
+.pytest_cache/
+*.log
+
 # Other Garbage
+.vs/
 github.json

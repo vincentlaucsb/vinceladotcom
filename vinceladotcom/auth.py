@@ -1,6 +1,5 @@
 ''' Handles authentication '''
 
-from . import database
 from wtforms import *
 import wtforms
 import flask
@@ -20,6 +19,8 @@ class LoginForm(wtforms.Form):
     submit = wtforms.SubmitField()
     
     def validate(self):
+        from . import database
+
         try:
             user = database.Users.select().where(
                 database.Users.name == self.name.data)[0]
@@ -35,10 +36,15 @@ class LoginForm(wtforms.Form):
         return None
         
 def new_user(name, password, full_name, email, is_admin=False):
-    database.Users(
-        name=name,
-        password=pbkdf2_sha256.hash(password),
-        full_name=full_name,
-        email=email,
-        is_admin=is_admin
-    ).save()
+    from . import database
+
+    try:
+        database.Users(
+            name=name,
+            password=pbkdf2_sha256.hash(password),
+            full_name=full_name,
+            email=email,
+            is_admin=is_admin
+        ).save()
+    except:
+        database.db.create_tables([database.Users])

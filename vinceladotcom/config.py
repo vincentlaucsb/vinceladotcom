@@ -1,3 +1,4 @@
+from typing import *
 from flask import Flask
 from os import path
 import json

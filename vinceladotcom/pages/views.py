@@ -1,17 +1,14 @@
 import os
-from copy import copy
-
-import flask_login
 import flask
 import peewee
 
-from flask_login import login_required
+from flask_login import current_user, login_required
 from flask import Blueprint, request, redirect, jsonify
-from .forms import *
-from .. import database
-from ..config import CURRENT_DIR, render_template, PAGE_GLOBALS
-
 from jinja2 import Template
+from copy import copy
+
+from vinceladotcom.pages.forms import *
+from vinceladotcom.config import CURRENT_DIR, render_template, PAGE_GLOBALS
 
 page = Blueprint('page', __name__)
 
@@ -25,7 +22,8 @@ def page_list():
 @page.route("/pages/<path:url>", methods=['GET'])
 def page_view(url):
     ''' Render a page '''
-    
+    from vinceladotcom import database
+
     try:
         page = database.Page.get(database.Page.url == url)
         template = page.template
@@ -34,14 +32,14 @@ def page_view(url):
         
         page.content = Template(page.content).render(
             page=page,
-            current_user=flask_login.current_user,
+            current_user=current_user,
             **PAGE_GLOBALS
         )
         
         return render_template(
             template,
             page=page,
-            current_user=flask_login.current_user,
+            current_user=current_user,
             **PAGE_GLOBALS
         )
         
@@ -52,6 +50,7 @@ def page_view(url):
 @login_required
 def page_new():
     ''' Create a new page '''
+    from vinceladotcom import database
     form = PageForm(request.form)
     preview = ''
     
@@ -64,14 +63,14 @@ def page_new():
             # Preview button pressed
             preview = Template(form.content.data).render(
                 page=form.data_dict(),
-                current_user=flask_login.current_user,
+                current_user=current_user,
                 **PAGE_GLOBALS
             )
     
     return render_template(
         'pages/editor.html',
         form=form,
-        current_user = flask_login.current_user,
+        current_user = current_user,
         preview=preview,
         target="/pages/new",
         page_globals = PAGE_GLOBALS
@@ -81,6 +80,7 @@ def page_new():
 @login_required
 def page_edit(page_id):
     ''' Update an existing page '''
+    from vinceladotcom import database
     page = database.Page.get(database.Page.id == page_id)
     form = PageForm(request.form)
     error = ''
@@ -111,12 +111,12 @@ def page_edit(page_id):
         else:
             # Preview button pressed
             preview = Template(form.content.data).render(page=page,
-                current_user = flask_login.current_user,
+                current_user = current_user,
                 **PAGE_GLOBALS)
     
     return render_template(
         'pages/editor.html', 
-        current_user = flask_login.current_user,
+        current_user = current_user,
         form=form, 
         error=error,
         preview=preview,
@@ -126,6 +126,7 @@ def page_edit(page_id):
     
 @page.route("/pages/history/<int:page_id>", methods=['GET', 'POST'])
 def page_history(page_id):
+    from vinceladotcom import database
     past_revisions = database.PageRevisions.select().where(
         database.PageRevisions.id == page_id
     )
@@ -143,6 +144,7 @@ def page_globals():
 @page.route("/pages/delete/<int:page_id>", methods=['GET', 'POST'])
 @login_required
 def page_delete(page_id):
+    from vinceladotcom import database
     page = database.Page.get(database.Page.id == page_id)
     page.delete_instance()
     

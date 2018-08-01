@@ -1,5 +1,7 @@
+from contextlib import contextmanager
 from peewee import *
 from playhouse.pool import PooledSqliteDatabase
+from vinceladotcom.main import application
 
 import datetime
 import json
@@ -16,14 +18,15 @@ def has_tag(tag_list, tag):
             return True
     
     return False
-   
-db = PooledSqliteDatabase(database='vince.sqlite')
-db.register_function(has_tag, name='has_tag', num_params=2)
 
 def title_to_url(title):
     ret = title.lower()
     ret = ret.replace(' ', '-')
     return ret
+
+db = SqliteDatabase(database=application.config['DATABASE'])
+db.register_function(has_tag, name='has_tag', num_params=2)
+db.register_function(title_to_url, name='title_to_url', num_params=1)
 
 class BaseModel(Model):
     class Meta:
@@ -69,11 +72,6 @@ class BlogPost(BasePage):
     author = CharField(200)
     draft = BooleanField(default=True)
     content = TextField()
-    urls = {} # Mapping of titles to blog IDs
-    
-    def __init__(self, *args, **kwargs):
-        super(BlogPost, self).__init__(*args, **kwargs)
-        BlogPost.urls[ self.url() ] = self.id
     
     def url(self):
         ''' Return URL of blog post relative to /blog/ '''
@@ -116,42 +114,37 @@ class Users(BaseModel):
     def is_active(self):
         return True
 
-#################
-# Create Tables #
-#################
+def db_init() -> None:
+    # Create tables
+    db.create_tables([
+        Users,
+        BlogPost,
+        Page,
+        BlogRevisions,
+        PageRevisions
+    ])
 
-db.create_tables([
-    Users,
-    BlogPost,
-    Page,
-    BlogRevisions,
-    PageRevisions
-])
-
-##############################
-# Post/Page Revision History #
-##############################
-
-db.execute_sql('''
-    CREATE TRIGGER IF NOT EXISTS blog_revisions_ins
-    UPDATE OF content on blogpost
-        BEGIN
-            INSERT INTO blogrevisions VALUES(
-                old.id,
-                old.content,
-                old.modified
-            );
-        END;
-''')
+    # Post/Page Revision History
+    db.execute_sql('''
+        CREATE TRIGGER IF NOT EXISTS blog_revisions_ins
+        UPDATE OF content on blogpost
+            BEGIN
+                INSERT INTO blogrevisions VALUES(
+                    old.id,
+                    old.content,
+                    old.modified
+                );
+            END;
+    ''')
         
-db.execute_sql('''
-    CREATE TRIGGER IF NOT EXISTS page_revisions_ins
-    UPDATE OF content on page
-        BEGIN
-            INSERT INTO pagerevisions VALUES(
-                old.id,
-                old.content,
-                old.modified
-            );
-        END;
-''')
+    db.execute_sql('''
+        CREATE TRIGGER IF NOT EXISTS page_revisions_ins
+        UPDATE OF content on page
+            BEGIN
+                INSERT INTO pagerevisions VALUES(
+                    old.id,
+                    old.content,
+                    old.modified
+                );
+            END;
+    ''')

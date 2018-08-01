@@ -9,7 +9,7 @@ __all__ = [
 import markupsafe
 from wtforms import validators, ValidationError, Form, BooleanField, TextAreaField, \
     TextField, SelectField, SubmitField, widgets, core, DateField
-from .config import CURRENT_DIR
+from vinceladotcom.config import CURRENT_DIR
 
 def get_templates():
     templates = []

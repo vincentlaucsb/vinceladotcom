@@ -3,8 +3,8 @@ import json
 
 from wtforms import validators, ValidationError, Form, BooleanField, TextAreaField, \
     TextField, SelectField, SubmitField
-from ..config import CURRENT_DIR
-from ..forms import *
+from vinceladotcom.config import CURRENT_DIR
+from vinceladotcom.forms import *
 
 def get_templates():
     templates = []

@@ -1,6 +1,6 @@
-# Third Party
+from typing import *
 import flask
-from flask import abort, redirect, flash, request
+from flask import Flask, abort, redirect, flash, request
 
 import wtforms
 from wtforms import validators, Form, FileField, SelectField, TextField, \
@@ -13,20 +13,20 @@ import os
 from os import path
 
 # My Libraries
-from .sitemap import Sitemap, SitemapEntry
-from .config import *
-from . import database
+from vinceladotcom.sitemap import Sitemap, SitemapEntry
+from vinceladotcom.config import *
 
 import json
 
-# App config
-from .secret import SECRET_KEY
 DEBUG = False
+
+from . import secret
 application = Flask(__name__, static_url_path='/static')
 application.config.from_object(__name__)
-application.config['SECRET_KEY'] = SECRET_KEY
+application.config['SECRET_KEY'] = secret.SECRET_KEY
+application.config['DATABASE'] = 'vince.sqlite'
 
-from . import auth, blog, pages
+from vinceladotcom import auth, blog, pages
 application.register_blueprint(blog.views.blog)
 application.register_blueprint(pages.views.page)
 
@@ -39,10 +39,12 @@ login_manager.init_app(application)
 
 @login_manager.user_loader
 def load_user(user_id):
+    from . import database
     return database.Users.get(user_id)
     
 @login_manager.unauthorized_handler
 def unauthorized_handler():
+    from . import database
     return redirect('/login')
     
 @application.route('/login', methods=['GET', 'POST'])
@@ -92,6 +94,7 @@ def index():
 @application.route("/sitemap.xml", methods=['GET'])
 def sitemap():
     ''' Generate a sitemap.xml at the root '''
+    from . import database
     
     _sitemap = Sitemap(request.url_root)
     
