@@ -1,7 +1,0 @@
-{
-"version": 3,
-"mappings": "AAAA,IAAK,CACD,KAAK,CAAE,IAAI,CACX,WAAW,CAAE,cAAc,CAC3B,SAAS,CAAE,IAAI,CACf,WAAW,CAAE,GAAG,CAChB,WAAW,CAAE,CAAC,CACd,YAAY,CAAE,CAAC,CAGnB,WAAe,CACX,WAAW,CAAE,4BAA4B,CAG7C,2CAAiD,CAC7C,OAAO,CAAE,IAAI,CAGjB,QAAS,CACL,OAAO,CAAE,YAAY",
-"sources": ["../../css-raw/tutorial-css/tutorial-print.scss"],
-"names": [],
-"file": "tutorial-print.css"
-}

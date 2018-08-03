@@ -23,12 +23,9 @@
         width: 26%; /* 33.33% - padding */
         margin-right: 2%;
         margin-bottom: $skip;
-        padding: $skip 2% $skip 2%;
+        padding: $skip;
         
         line-height: 1.35;
-        
-        /* A e s t h e t i c s */
-        border: 1px solid darken($light-gray, 10%);
         
         /* Allows items to expand to fill up missing space */
         flex-grow: 1;
