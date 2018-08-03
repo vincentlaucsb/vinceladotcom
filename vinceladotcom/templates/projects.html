@@ -1,5 +1,38 @@
-{% extends "base_page.html" %}
+{% extends "base.html" %}
+
+{% block metadata %}
+{% for k, v in page.meta_parsed.items() %}
+    <meta name="{{ k }}" content="{{ v }}">
+{% endfor %}
+{% endblock %}
+
+{% block more_head %}
+<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+<link href="{{ url_for('static', filename='theme/css/projects.css') }}" rel='stylesheet' type='text/css'>
+<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+<!--
+<script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+-->
+
+<style type="text/css">   
+    {{ page.custom_css|safe }}
+</style>
+{% endblock %}
+
+{% block title_class %}title-regular{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
+{% block page_title %}
+    {{ page.title }}
+    {% if current_user.is_authenticated %}
+    <span style="float: right; font-size: 50%;">
+        <a href="/pages/edit/{{ page.id }}">[edit]</a>
+    </span>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     {{ page.content|safe }}
+    <script src="/static/vince.js/content-filter/js/filter.js"></script>
 {% endblock %}

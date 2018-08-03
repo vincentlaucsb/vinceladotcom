@@ -1,0 +1,61 @@
+@import 'buttons';
+@import 'grids';
+
+div.filter {
+    nav {
+        button {
+            margin: 0 $small-size $small-size 0;
+        }
+        
+        button.inactive {
+            @extend .big-button-disabled;
+        }
+    }
+}
+
+div.filter > div {
+    @extend %grid-container-nx3;
+    
+    .item {
+        display: flex;
+        flex-direction: column;
+        min-height: 33vh;
+    }
+    
+    h3 {
+        margin-bottom: $small-skip/2;
+    }
+    
+    /** List of Tags */
+    p.tags {
+        span {
+            background-color: lighten($charcoal, 10%);
+            border-radius: 0.25em;
+            color: $white;
+            
+            font-size: $small-size;
+            font-family: $sans-serif;
+            font-weight: normal;
+            
+            margin: 0.25em;
+            padding: 0.25em;
+            
+        }
+        
+        span:first-child {
+            margin-left: 0;
+        }
+        
+        span:last-child {
+            margin-right: 0;
+        }
+    }
+    
+    p.description {
+        flex-grow: 2;
+    }
+    
+    nav {
+        text-align: right;
+    }
+}

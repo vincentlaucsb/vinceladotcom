@@ -1,7 +1,7 @@
 @import 'colors';
 
 /* n rows by 3 columns grid */
-.grid-container-nx3 {
+%grid-container-nx3 {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -18,7 +18,7 @@
     
     p { max-width: 100%; }
     
-    > div, > section {
+    > div {
         min-width: 15em;
         width: 26%; /* 33.33% - padding */
         margin-right: 2%;
@@ -41,7 +41,6 @@
         /* Buttons */
         p:last-child {
             width: 100%;
-            text-align: right;
             margin-bottom: 0;
             
             a { margin-left: 0.5em; }
@@ -53,10 +52,4 @@
         font-weight: 500;
         line-height: 1.2;
     }
-}
-
-/* For Projects page */
-h3 span {
-    font-size: $small-size;
-    display: block;
 }

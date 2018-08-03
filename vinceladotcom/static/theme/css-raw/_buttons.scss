@@ -19,7 +19,7 @@
     */
     
     border: 0;
-    border-radius: 0.2em;
+    /** border-radius: 0.2em; */
     display: inline-block;
     cursor: pointer;
 }
@@ -32,6 +32,13 @@
 }
 .big-button:hover { background-color: darken($od-green, 30%); }
 
+.big-button-disabled {
+    background-color: $charcoal;
+    color: $white;
+    
+    @extend .big-button-base;  
+}
+
 .big-button-brown { 
     background-color: lighten($dirt, 10%);
     color: $white;
@@ -39,12 +46,6 @@
     @extend .big-button-base;
 }
 .big-button-brown:hover { background-color: $dirt; }
-
-// Special rules for the black GitHub logos
-.big-button-brown > img {
-    margin-bottom: 0;
-    filter: invert(100%);
-}
 
 button { @extend .big-button; }
 

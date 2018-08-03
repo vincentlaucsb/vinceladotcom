@@ -12,4 +12,5 @@ secret.py
 
 # Other Garbage
 .vs/
+.sass-cache/
 github.json
