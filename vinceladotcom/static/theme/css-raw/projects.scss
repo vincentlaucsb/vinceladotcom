@@ -39,6 +39,11 @@ div.filter > div {
         min-height: 33vh;
         
         background-color: lighten($sand, 5%);
+        
+        img {
+            max-height: 50vh;
+            object-fit: cover;
+        }
     }
     
     h3 {
