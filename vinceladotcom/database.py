@@ -62,6 +62,7 @@ class BasePage(BaseModel):
     def __init__(self, *args, **kwargs):
         super(BasePage, self).__init__(*args, **kwargs)
         
+        self.meta_parsed = {}
         if self.meta:
             meta_data = json.loads(self.meta)
             self.meta_parsed = meta_data

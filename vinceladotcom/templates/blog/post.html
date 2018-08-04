@@ -2,6 +2,27 @@
 
 <!-- Template for blog posts -->
 
+{% block metadata %}
+{% for k, v in post.meta_parsed.items() %}
+    <meta name="{{ k }}" content="{{ v }}">
+{% endfor %}
+
+<!--
+    Open Graph Tags
+    https://www.linkedin.com/help/linkedin/answer/46687/making-your-website-shareable-on-linkedin?lang=en
+-->
+{% if 'og:title' not in post.meta_parsed.keys() %}
+    <meta property="og:title" content="{{post.title}}" />
+{% endif %}
+
+{% if 'og:description' not in post.meta_parsed.keys() %}
+    <meta property="og:description" content="{{post.description}}" />
+{% endif %}
+
+    <meta property="og:url" content="{{request.url}}" />
+
+{% endblock %}
+
 {% block more_head %}
     <link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
 
