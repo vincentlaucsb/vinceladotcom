@@ -20,8 +20,18 @@ def has_tag(tag_list, tag):
     return False
 
 def title_to_url(title):
-    ret = title.lower()
-    ret = ret.replace(' ', '-')
+    temp = title.lower()
+    ret = ''
+    for i in temp:
+        if i.isalnum():
+            ret += i
+        elif (i == '+'):
+            ret += 'p'
+        elif (i == ' '):
+            ret += '-'
+            
+        # Strip other characters
+    
     return ret
 
 db = SqliteDatabase(database=application.config['DATABASE'])
