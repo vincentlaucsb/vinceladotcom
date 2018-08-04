@@ -3,14 +3,37 @@
 <!-- Template for blog posts -->
 
 {% block more_head %}
-<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+    <link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+
+    <!-- Breadcrumbs Enhacement -->
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https://vincela.com/blog",
+          "name": "Blog"
+        }
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@id": "https://vincela.com/blog/{{post.url()}}/",
+          "name": "{{ post.title }}"
+        }
+      }]
+    }
+    </script>
 {% endblock %}
 
 {% block title_class %}title-regular{% endblock %}
 {% block title %}{{ post.title }}{% endblock %}
 {% block page_title %}
     {{ post.title }}
-    {% if current_user.is_authenticated %}
+
     <span class="page-info">
         Published: {{ post.created }}
         {% if post.created != post.modified %}
@@ -18,6 +41,8 @@
         Last Updated: {{ post.modified }}
         {% endif %}
     </span>
+    
+    {% if current_user.is_authenticated %}
     <span style="float: right; font-size: 50%;">
         <a href="/blog/edit/{{ post.id }}">[edit]</a>
     </span>
