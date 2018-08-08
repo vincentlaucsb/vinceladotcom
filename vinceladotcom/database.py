@@ -2,9 +2,13 @@ from contextlib import contextmanager
 from peewee import *
 from playhouse.pool import PooledSqliteDatabase
 from vinceladotcom.main import application
+from vinceladotcom.config import STATIC_DIR
 
+import os
 import datetime
 import json
+
+DISPLAY_IMAGE_DIR = os.path.join(STATIC_DIR, 'blog', 'display')
 
 def has_tag(tag_list, tag):
     ''' Parse the tag field of a page '''
@@ -84,9 +88,21 @@ class BlogPost(BasePage):
     draft = BooleanField(default=True)
     content = TextField()
     
+    @property
     def url(self):
         ''' Return URL of blog post relative to /blog/ '''
         return title_to_url(self.title)
+
+    @property
+    def image(self):
+        ''' Return the path to image (if it exists) '''
+        # TODO: Non JPG files?
+        image_name = '{}.jpg'.format(self.id)
+        image_path = os.path.join(DISPLAY_IMAGE_DIR, image_name)
+    
+        if os.path.isfile(image_path):
+            return '/static/blog/display/' + image_name
+        return None
     
 class Page(BasePage):
     title = CharField(200)

@@ -2,7 +2,7 @@ from .test_site import client, admin_client, login, logout, site
 
 def test_make_post(admin_client):
     ''' Make sure that posting new entries works properly '''
-    rv = admin_client.post('/blog/new', data=dict(
+    rv = admin_client.post('/blog/', data=dict(
         page_title='Why We Should Nuke Canada',
         tags='america, canada, freedom',
         content='Because they drink syrup',
@@ -25,7 +25,7 @@ def test_make_post(admin_client):
 def test_get_post(admin_client):
     ''' Make sure that getting blog posts as a guest works '''
 
-    rv = admin_client.post('/blog/new', data=dict(
+    rv = admin_client.post('/blog/', data=dict(
         page_title='Why We Should Nuke Canada',
         tags='america, canada, freedom',
         content='Because they drink syrup',

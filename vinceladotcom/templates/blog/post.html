@@ -41,28 +41,30 @@
     "@type": "ListItem",
     "position": 2,
     "item": {
-    "@id": "https://vincela.com/blog/{{post.url()}}/",
+    "@id": "https://vincela.com/blog/{{post.url}}/",
     "name": "{{ post.title }}"
     }
     }]
     }
 </script>
 
+{% if post.image %}
 <style type="text/css">
     .title-big {
         background:
             linear-gradient(to bottom,
                             rgba(41, 41, 41, 0.2) 0%,
                             rgba(41, 41, 41, 1)),
-            url('{{ image }}');
+            url('{{ post.image }}');
         background-size: 100vw;
         background-blend-mode: saturation;
     }
 </style>
+{% endif %}
 {% endblock %}
 
 {% block title_class %}
-{% if image %}title-big
+{% if post.image %}title-big
 {% else %}title-regular
 {% endif %}
 {% endblock %}
@@ -78,7 +80,7 @@
 <p>
     by {{ post.author }} {% if current_user.is_authenticated %}
     <span style="float: right; font-size: 50%;">
-        <a href="/blog/edit/{{ post.id }}">[edit]</a>
+        <a href="/blog/{{ post.id }}">[edit]</a>
     </span>
     {% endif %}
     

@@ -1,4 +1,4 @@
-{% extends "big_title.html" %}
+{% extends "plain.html" %}
 
 <!-- Base template for any pages with editors -->
 
@@ -13,17 +13,7 @@
     <link rel="stylesheet" type="text/css" href="/static/vince.js/css/ace-preview.css">
     <link rel="stylesheet" type="text/css" href="/static/vince.js/css/minimizer.css">
     
-    <style type="text/css">
-        .title-big {
-            background:
-                linear-gradient(to bottom,
-                                rgba(41, 41, 41, 0.2) 0%,
-                                rgba(41, 41, 41, 0.2)),
-                url('/static/images/june_lake_boi.jpg');
-            background-size: 100vw;
-            background-blend-mode: saturation;
-        }
-        
+    <style type="text/css">        
         textarea#content, textarea#metadata {
             display: none;
         }

@@ -1,4 +1,5 @@
 # Secrets
+static/blog/
 secret.py
 *.sqlite
 

@@ -78,7 +78,7 @@ def login():
 def logout():
     flask_login.logout_user()
     return render_template(
-        'message.html',
+        'plain.html',
         title='Logged out',
         message='You have been logged out.'
     )

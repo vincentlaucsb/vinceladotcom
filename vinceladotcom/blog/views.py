@@ -1,6 +1,6 @@
 from flask_login import login_required
 from flask import Blueprint, request, redirect
-from flask.views import View
+from flask.views import MethodView, View
 from peewee import *
 
 from abc import ABC, abstractmethod
@@ -10,27 +10,14 @@ from .forms import *
 from .. import markdown
 from ..config import render_template, STATIC_DIR
 
-DISPLAY_IMAGE_DIR = os.path.join(STATIC_DIR, 'blog', 'display')
 blog = Blueprint('blog', __name__)
 
 #################
 # Blog Controls
 #################
 
-def get_post_image(id):
-    ''' Return the path to image (if it exists) '''
-    from os.path import isfile, join
-    
-    # TODO: Non JPG files?
-    image_name = '{}.jpg'.format(id)
-    image_path = join(DISPLAY_IMAGE_DIR, image_name)
-    
-    if isfile(image_path):
-        return '/static/blog/display/' + image_name
-    return None
-
 def create_post_image(id, data):
-    ''' Create a display image for a blog '''        
+    ''' Create a display image for a blog '''
     # TODO: Non JPG files?
     image_name = '{}.jpg'.format(id)
     image_path = os.path.join(DISPLAY_IMAGE_DIR, image_name)
@@ -44,22 +31,7 @@ def create_post_image(id, data):
         os.makedirs(image_folder)
         write()
 
-@blog.route("/blog/", methods=['GET'])
-def blog_list():
-    from .. import database
-    posts = []
-    drafts = []
-    
-    for post in database.BlogPost.select().order_by(
-        database.BlogPost.created.desc()):
-        if not post.draft:
-            posts.append(post)
-        else:
-            drafts.append(post)
-            
-    return render_template('blog/index.html', posts=posts, drafts=drafts)
-
-@blog.route("/blog/<title>/", methods=['GET'])
+@blog.route("/blog/<string:title>/", methods=['GET'])
 def blog_article(title):
     from .. import database
 
@@ -69,87 +41,125 @@ def blog_article(title):
     return render_template(
         'blog/post.html',
         post=article,
-        image=get_post_image(article.id),
         content=markdown.parse_markdown(article.content)
     )
-    
-class blog_base(ABC, View):
-    methods = ['GET', 'POST']
 
-    def __init__(self, *args, **kwargs):
-        super(blog_base, self).__init__(*args, **kwargs)
-        self.blog = None
-        self.form = None
+@blog.route("/blog/new", methods=['GET'])
+def blog_new():
+    return render_template(
+        'blog/editor.html',
+        current_user=current_user,
+        form=BlogForm(request.form),
+        target='/blog/'
+    )
 
-    @abstractmethod
-    def target(self, *args, **kwargs):
-        pass
+class BlogAPI(MethodView):
 
-    def get(self):
-        pass
-
-    @abstractmethod
-    def submit(self):
-        pass
-
-    def dispatch_request(self, post_id=None):
+    @staticmethod
+    def get_post(post_id):
         from .. import database
-        # Render article
-        if (post_id):
-            self.blog = database.BlogPost.get(database.BlogPost.id == post_id)
+        return database.BlogPost.get(database.BlogPost.id == post_id)
+    
+    def get(self, post_id=None):
+        from .. import database
+
+        if post_id is None:
+            # Return a list of users
+            posts = []
+            drafts = []
+            deleted = []
+    
+            for post in database.BlogPost.select().order_by(
+                database.BlogPost.created.desc()):
+                if post.deleted:
+                    deleted.append(post)
+                elif not post.draft:
+                    posts.append(post)
+                else:
+                    drafts.append(post)
             
-        self.form = BlogForm(request.form)
-        preview = ''
-    
-        if request.method == 'GET':
-            self.get()
-        elif request.method == 'POST':
-            if self.form.submit.data: # Submit button pressed
-                self.submit()
-                if (request.files):  # Handle image
-                    create_post_image(self.blog.id, request.files['image'])
-                
-                return redirect('blog/' + self.blog.url())
+            return render_template(
+                'blog/index.html',
+                posts=posts, drafts=drafts, deleted=deleted
+            )
+
+        else:
+            # Show editor for single post
+            post = self.get_post(post_id)
+            form = BlogForm(request.form)
+            form.fill(post)
+
+            return render_template(
+                'blog/editor.html',
+                target='/blog/{}'.format(post_id),
+                current_user=current_user,
+                form=form,
+                post=post
+            )
+
+    def post(self, post_id=None):
+        from .. import database
+
+        if (not post_id):
+            # Create a new page
+            form = BlogForm(request.form)
+            post = database.BlogPost.create(author=current_user.full_name, **form.data_dict())
+
+            if (request.files):  # Handle image
+                create_post_image(post.id, request.files['image'])
+
+            return redirect('blog/' + post.url)
+        else:
+            # Update a page (funnel PUT request)
+            if (request.form['_method'] == 'put'):
+                return self.put(post_id)
             else:
-                # Preview button pressed
-                preview = markdown.parse_markdown(self.form.content.data)
-    
+                abort(405)
+
+    def put(self, post_id):
+        # Update a page
+        from .. import database
+
+        form = BlogForm(request.form)
+        post = database.BlogPost(
+            id=post_id,
+            author=current_user.full_name,
+            **form.data_dict())
+        post.save()
+
+        if (request.files):  # Handle image
+            create_post_image(post.id, request.files['image'])
+
+        return redirect('blog/' + post.url)
+            
+    def delete(self, post_id):
+        # Delete the specified post
+
+        post = self.get_post(post_id)
+        if (not post.deleted):
+            # Mark as "deleted" without deleting
+            post.deleted = True
+            post.save()
+        else:
+            # If marked as deleted, then perma-delete
+            post.delete_instance()
+            
         return render_template(
-            'blog/editor.html',
-            current_user=current_user,
-            form=self.form,
-            preview=preview,
-            target=self.target(post_id)
+            'message.html',
+            title='Deleted',
+            message='Deleted page'
         )
 
-class BlogCreator(blog_base):
-    def target(self, *args, **kwargs):
-        return '/blog/new'
+blog_view = BlogAPI.as_view('blog_api')
+blog.add_url_rule(
+    '/blog/',
+    view_func=blog_view, methods=['GET', 'POST']
+)
 
-    def submit(self):
-        from .. import database
-        self.blog = database.BlogPost.create(author=current_user.full_name, **self.form.data_dict())
-
-class BlogEditor(blog_base):
-    def target(self, post_id):
-        return '/blog/edit/' + str(post_id)
-
-    def submit(self):
-        from .. import database
-        database.BlogPost(
-            id=self.blog.id,
-            author=current_user.full_name,
-            **self.form.data_dict()
-        ).save()
-
-    def get(self):
-        # Form Attributes
-        self.form.fill(self.blog)
-
-blog_editor_view = login_required(BlogEditor.as_view('blog_editor'))
-blog_new_view = login_required(BlogCreator.as_view('blog_creator'))
-blog.add_url_rule('/blog/edit/<int:post_id>', view_func=blog_editor_view)
-blog.add_url_rule('/blog/new', view_func=blog_new_view)
+# Because HTML forms only support GET/POST, POST endpoint
+# merely funnels PUT requests (or throws errors)
+blog.add_url_rule('/blog/<int:post_id>', view_func=blog_view,
+                  methods=['GET', 'POST', 'PUT', 'DELETE'])
     
 ########
 # Tags #

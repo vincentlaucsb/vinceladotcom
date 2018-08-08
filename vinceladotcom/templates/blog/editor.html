@@ -1,31 +1,41 @@
 {% extends "base_editor.html" %}
 
-{% block title %}New Post{% endblock %}
-{% block page_title %}New Post{% endblock %}
+<!-- Template for editing and creating pages -->
+
+{% block title %}
+    {% if post %}
+    Editing: {{ post.title }}
+    {% else %}
+    New Post
+    {% endif %}
+{% endblock %}
+{% block page_title %}
+    {% if post %}
+    Editing: {{ post.title }}
+    {% else %}
+    New Post
+    {% endif %}
+{% endblock %}
 
 {% block more_content %}
-    <h2>New Post</h2>
-    <!-- enctype="multipart/form-data" necessary for file transfer -->
-    <form enctype="multipart/form-data" action="{{ target }}" method="post">
-        {{ form.csrf}}
-        
-        <label>Title: {{ form.page_title }}</label>
-        <label>Author: {{ current_user.full_name }} (logged in as {{ current_user.name }})</label>
-        <label>Date: {{ form.created }}</label>
-        <label>Image: {{ form.image }}</label>
-        <label>Tags: {{ form.tags }}</label>
-        <label>Draft: {{ form.draft }}</label>
-        
-        {{ form.content }}
+<!-- enctype="multipart/form-data" necessary for file transfer -->
+<form enctype="multipart/form-data" action="{{ target }}" method="post">
+    {{ form.csrf }}
 
-        <h3> Metadata</h3>
-        {{ form.metadata }}
-        
-        {{ form.submit }} {{ form.preview }}
-    </form>
-    
-    {% if preview %}
-    <h2>Preview</h2>
-    {{ preview }}
-    {% endif %}
+    {% if post %}<input type="hidden" name="_method" value="put" />{% endif %}
+
+    <label>Title: {{ form.page_title }}</label>
+    <label>Author: {{ current_user.full_name }} (logged in as {{ current_user.name }})</label>
+    <label>Date: {{ form.created }}</label>
+    <label>Image: {{ form.image }}</label>
+    <label>Tags: {{ form.tags }}</label>
+    <label>Draft: {{ form.draft }}</label>
+
+    {{ form.content }}
+
+    <h2> Metadata</h2>
+    {{ form.metadata }}
+
+    {{ form.submit }} {{ form.preview }}
+</form>
 {% endblock %}
