@@ -5,12 +5,14 @@
 
 {% block more_content %}
     <h2>New Post</h2>
-    <form action="{{ target }}" method="post">
+    <!-- enctype="multipart/form-data" necessary for file transfer -->
+    <form enctype="multipart/form-data" action="{{ target }}" method="post">
         {{ form.csrf}}
         
         <label>Title: {{ form.page_title }}</label>
         <label>Author: {{ current_user.full_name }} (logged in as {{ current_user.name }})</label>
         <label>Date: {{ form.created }}</label>
+        <label>Image: {{ form.image }}</label>
         <label>Tags: {{ form.tags }}</label>
         <label>Draft: {{ form.draft }}</label>
         

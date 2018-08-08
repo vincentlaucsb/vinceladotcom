@@ -9,7 +9,7 @@ __all__ = [
 import markupsafe
 from wtforms import validators, ValidationError, Form, BooleanField, TextAreaField, \
     TextField, SelectField, SubmitField, widgets, core, DateField
-from vinceladotcom.config import CURRENT_DIR
+from vinceladotcom.config import CURRENT_DIR, invert_dict
 
 def get_templates():
     templates = []
@@ -19,6 +19,46 @@ def get_templates():
             templates.append(i)
             
     return templates
+
+def parse_metadata(data):
+    '''
+    Given colon delimited lines of key-value pairs, return 
+    a JSON representation
+    '''
+    
+    temp = {}
+    for row in data.split('\n'):
+        try:
+            k, v = row.split(':')
+        except ValueError:
+            # More than 2 colons
+            splitted = row.split(':')
+            k = ':'.join(splitted[:-1])
+            v = splitted[-1]
+        
+        # Remove carriage return
+        v = v.replace('\r', '')
+        
+        # Strip leading space
+        if v.startswith(' '):
+            temp[k] = v[1:]
+        else:
+            temp[k] = v
+
+    return json.dumps(temp)
+    
+def deserialize_metadata(_json):
+    ''' Deserialize metadata '''
+    
+    temp = ''
+    
+    try:
+        for k, v in json.loads(_json).items():
+            temp += '{}: {}\n'.format(k, v)
+    except json.decoder.JSONDecodeError:
+        pass
+    
+    return temp
 
 class BaseForm(Form):
     errors = []
@@ -46,10 +86,24 @@ class BaseForm(Form):
         
         temp =  { k: getattr(self, v).data for k, v in self.__class__.db_mapping.items() }
         
+        # Parse metadata, TODO: Move to a subclass
+        temp['meta'] = parse_metadata(temp['meta'])
+
         # Convert datetime objects to strings
         temp['created'] = str(temp['created'])
         return temp
-    
+
+    def fill(self, db_row):
+        ''' Opposite of data_dict
+            Fill a form from a database object
+        '''
+
+        for k, v in invert_dict(self.__class__.db_mapping).items():
+            getattr(self, k).data = getattr(db_row, v)
+
+        # Deserialize metadata, TODO: Move to a subclass
+        self.metadata.data = deserialize_metadata(db_row.meta)
+
 class AceText(widgets.TextArea):
     ''' Custom widget for my ACE text editor hack '''
 

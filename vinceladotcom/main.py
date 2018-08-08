@@ -18,7 +18,7 @@ from vinceladotcom.config import *
 
 import json
 
-DEBUG = False
+DEBUG = True
 
 from . import secret
 application = Flask(__name__, static_url_path='/static')

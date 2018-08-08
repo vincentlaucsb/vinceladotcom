@@ -1,4 +1,4 @@
-from vinceladotcom.pages.forms import parse_metadata, deserialize_metadata
+from vinceladotcom.forms import parse_metadata, deserialize_metadata
 import vinceladotcom as site
 import pytest
 

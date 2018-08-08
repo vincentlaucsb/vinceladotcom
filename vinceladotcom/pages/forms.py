@@ -14,53 +14,13 @@ def get_templates():
             templates.append(i)
             
     return templates
-
-def parse_metadata(data):
-    '''
-    Given colon delimited lines of key-value pairs, return 
-    a JSON representation
-    '''
-    
-    temp = {}
-    for row in data.split('\n'):
-        try:
-            k, v = row.split(':')
-        except ValueError:
-            # More than 2 colons
-            splitted = row.split(':')
-            k = ':'.join(splitted[:-1])
-            v = splitted[-1]
-        
-        # Remove carriage return
-        v = v.replace('\r', '')
-        
-        # Strip leading space
-        if v.startswith(' '):
-            temp[k] = v[1:]
-        else:
-            temp[k] = v
-
-    return json.dumps(temp)
-    
-def deserialize_metadata(_json):
-    ''' Deserialize metadata '''
-    
-    temp = ''
-    
-    try:
-        for k, v in json.loads(_json).items():
-            temp += '{}: {}\n'.format(k, v)
-    except json.decoder.JSONDecodeError:
-        pass
-    
-    return temp
     
 class PageForm(BaseForm):
     # Mapping of database column names to form names
     db_mapping = dict(
         title = 'page_title',
         content = 'content',
-        css = 'custom_css',
+        custom_css = 'custom_css',
         url = 'url',
         markdown = 'markdown',
         meta = 'metadata',
@@ -81,12 +41,6 @@ class PageForm(BaseForm):
     submit = SubmitField()
     preview = SubmitField()
     markdown = BooleanField(default=False)
-    
-    def data_dict(self):
-        ''' Parse metadata '''
-        data = super(PageForm, self).data_dict()
-        data['meta'] = parse_metadata(data['meta'])
-        return data
     
     def validate_metadata(form, field):
         try:

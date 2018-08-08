@@ -1,16 +1,48 @@
 from flask_login import login_required
 from flask import Blueprint, request, redirect
+from flask.views import View
 from peewee import *
+
+from abc import ABC, abstractmethod
+import os
 
 from .forms import *
 from .. import markdown
-from ..config import render_template
+from ..config import render_template, STATIC_DIR
 
+DISPLAY_IMAGE_DIR = os.path.join(STATIC_DIR, 'blog', 'display')
 blog = Blueprint('blog', __name__)
 
 #################
 # Blog Controls
 #################
+
+def get_post_image(id):
+    ''' Return the path to image (if it exists) '''
+    from os.path import isfile, join
+    
+    # TODO: Non JPG files?
+    image_name = '{}.jpg'.format(id)
+    image_path = join(DISPLAY_IMAGE_DIR, image_name)
+    
+    if isfile(image_path):
+        return '/static/blog/display/' + image_name
+    return None
+
+def create_post_image(id, data):
+    ''' Create a display image for a blog '''        
+    # TODO: Non JPG files?
+    image_name = '{}.jpg'.format(id)
+    image_path = os.path.join(DISPLAY_IMAGE_DIR, image_name)
+    
+    def write():
+        data.save(image_path)
+
+    try:
+        write()
+    except FileNotFoundError:
+        os.makedirs(image_folder)
+        write()
 
 @blog.route("/blog/", methods=['GET'])
 def blog_list():
@@ -37,71 +69,87 @@ def blog_article(title):
     return render_template(
         'blog/post.html',
         post=article,
+        image=get_post_image(article.id),
         content=markdown.parse_markdown(article.content)
     )
     
-@blog.route("/blog/edit/<int:post_id>", methods=['GET', 'POST'])
-@login_required
-def blog_edit(post_id):
-    from .. import database
-    # Render article
-    blog = database.BlogPost.get(database.BlogPost.id == post_id)
-    form = BlogForm(request.form)
+class blog_base(ABC, View):
+    methods = ['GET', 'POST']
+
+    def __init__(self, *args, **kwargs):
+        super(blog_base, self).__init__(*args, **kwargs)
+        self.blog = None
+        self.form = None
+
+    @abstractmethod
+    def target(self, *args, **kwargs):
+        pass
+
+    def get(self):
+        pass
+
+    @abstractmethod
+    def submit(self):
+        pass
+
+    def dispatch_request(self, post_id=None):
+        from .. import database
+        # Render article
+        if (post_id):
+            self.blog = database.BlogPost.get(database.BlogPost.id == post_id)
+            
+        self.form = BlogForm(request.form)
+        preview = ''
     
-    preview = ''
+        if request.method == 'GET':
+            self.get()
+        elif request.method == 'POST':
+            if self.form.submit.data: # Submit button pressed
+                self.submit()
+                if (request.files):  # Handle image
+                    create_post_image(self.blog.id, request.files['image'])
+                
+                return redirect('blog/' + self.blog.url())
+            else:
+                # Preview button pressed
+                preview = markdown.parse_markdown(self.form.content.data)
     
-    # Form Attributes
-    if request.method == 'GET':
-        form.page_title.data = blog.title
-        form.created.data = blog.created
-        form.content.data = blog.content
-        form.draft.data = blog.draft
-        form.metadata.data = blog.meta
-        form.tags.data = blog.tags
-    
-    # Show a preview of the rendered Markdown
-    elif request.method == 'POST':
-    
-        if form.submit.data:
-            # Submit button pressed
-            database.BlogPost(id=blog.id, author=current_user.full_name, **form.data_dict()).save()
-            return redirect('blog/' + blog.url())
-        else:
-            # Preview button pressed
-            preview = markdown.parse_markdown(form.content.data)
-    
-    return render_template(
-        'blog/editor.html',
-        current_user=current_user,
-        form=form,
-        preview=preview,
-        target='/blog/edit/' + str(post_id)
-    )
-    
-@blog.route("/blog/new", methods=['GET', 'POST'])
-@login_required
-def blog_post():
-    from .. import database
-    form = BlogForm(request.form)
-    preview = ''
-    
-    # Show a preview of the rendered Markdown
-    if request.method == 'POST':
-    
-        if form.submit.data:
-            # Submit button pressed
-            database.BlogPost.create(author=current_user.full_name, **form.data_dict())
-        else:
-            # Preview button pressed
-            preview = markdown.parse_markdown(form.content.data)
-    
-    return render_template(
-        'blog/editor.html',
-        current_user=current_user,
-        form=form,
-        preview=preview,
-        target='/blog/new'
-    )
+        return render_template(
+            'blog/editor.html',
+            current_user=current_user,
+            form=self.form,
+            preview=preview,
+            target=self.target(post_id)
+        )
+
+class BlogCreator(blog_base):
+    def target(self, *args, **kwargs):
+        return '/blog/new'
+
+    def submit(self):
+        from .. import database
+        self.blog = database.BlogPost.create(author=current_user.full_name, **self.form.data_dict())
+
+class BlogEditor(blog_base):
+    def target(self, post_id):
+        return '/blog/edit/' + str(post_id)
+
+    def submit(self):
+        from .. import database
+        database.BlogPost(
+            id=self.blog.id,
+            author=current_user.full_name,
+            **self.form.data_dict()
+        ).save()
+
+    def get(self):
+        # Form Attributes
+        self.form.fill(self.blog)
+
+blog_editor_view = login_required(BlogEditor.as_view('blog_editor'))
+blog_new_view = login_required(BlogCreator.as_view('blog_creator'))
+blog.add_url_rule('/blog/edit/<int:post_id>', view_func=blog_editor_view)
+blog.add_url_rule('/blog/new', view_func=blog_new_view)
     
 ########
 # Tags #

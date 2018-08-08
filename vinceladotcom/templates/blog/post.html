@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
 <!-- Template for blog posts -->
-
 {% block metadata %}
 {% for k, v in post.meta_parsed.items() %}
-    <meta name="{{ k }}" content="{{ v }}">
+<meta name="{{ k }}" content="{{ v }}">
 {% endfor %}
 
 <!--
@@ -12,49 +11,77 @@
     https://www.linkedin.com/help/linkedin/answer/46687/making-your-website-shareable-on-linkedin?lang=en
 -->
 {% if 'og:title' not in post.meta_parsed.keys() %}
-    <meta property="og:title" content="{{post.title}}" />
+<meta property="og:title" content="{{post.title}}" />
 {% endif %}
 
 {% if 'og:description' not in post.meta_parsed.keys() %}
-    <meta property="og:description" content="{{post.description}}" />
+<meta property="og:description" content="{{post.description}}" />
 {% endif %}
 
-    <meta property="og:url" content="{{request.url}}" />
+<meta property="og:url" content="{{request.url}}" />
 
 {% endblock %}
 
 {% block more_head %}
-    <link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
+<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
 
-    <!-- Breadcrumbs Enhacement -->
-    <script type="application/ld+json">
+<!-- Breadcrumbs Enhacement -->
+<script type="application/ld+json">
     {
-      "@context": "http://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [{
-        "@type": "ListItem",
-        "position": 1,
-        "item": {
-          "@id": "https://vincela.com/blog",
-          "name": "Blog"
-        }
-      },{
-        "@type": "ListItem",
-        "position": 2,
-        "item": {
-          "@id": "https://vincela.com/blog/{{post.url()}}/",
-          "name": "{{ post.title }}"
-        }
-      }]
+    "@context": "http://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "item": {
+    "@id": "https://vincela.com/blog",
+    "name": "Blog"
     }
-    </script>
+    },{
+    "@type": "ListItem",
+    "position": 2,
+    "item": {
+    "@id": "https://vincela.com/blog/{{post.url()}}/",
+    "name": "{{ post.title }}"
+    }
+    }]
+    }
+</script>
+
+<style type="text/css">
+    .title-big {
+        background:
+            linear-gradient(to bottom,
+                            rgba(41, 41, 41, 0.2) 0%,
+                            rgba(41, 41, 41, 1)),
+            url('{{ image }}');
+        background-size: 100vw;
+        background-blend-mode: saturation;
+    }
+</style>
 {% endblock %}
 
-{% block title_class %}title-regular{% endblock %}
+{% block title_class %}
+{% if image %}title-big
+{% else %}title-regular
+{% endif %}
+{% endblock %}
+
 {% block title %}{{ post.title }}{% endblock %}
 {% block page_title %}
-    {{ post.title }}
+{{ post.title }}
+<span>{{ post.description }}</span>
 
+{% endblock %}
+
+{% block content %}
+<p>
+    by {{ post.author }} {% if current_user.is_authenticated %}
+    <span style="float: right; font-size: 50%;">
+        <a href="/blog/edit/{{ post.id }}">[edit]</a>
+    </span>
+    {% endif %}
+    
     <span class="page-info">
         Published: {{ post.created }}
         {% if post.created != post.modified %}
@@ -62,14 +89,7 @@
         Last Updated: {{ post.modified }}
         {% endif %}
     </span>
-    
-    {% if current_user.is_authenticated %}
-    <span style="float: right; font-size: 50%;">
-        <a href="/blog/edit/{{ post.id }}">[edit]</a>
-    </span>
-    {% endif %}
-{% endblock %}
+</p>
 
-{% block content %}
-    {{ content|safe }}
+{{ content|safe }}
 {% endblock %}

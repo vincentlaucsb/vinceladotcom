@@ -1,5 +1,5 @@
 from flask_login import current_user
-from wtforms import validators, Form, BooleanField, TextAreaField, \
+from wtforms import validators, Form, FileField, BooleanField, TextAreaField, \
     TextField, SubmitField
 from ..forms import BaseForm, AceTextField
 
@@ -16,6 +16,7 @@ class BlogForm(BaseForm):
 
     content = AceTextField(mode='ace/mode/markdown')
     metadata = AceTextField(mode='ace/mode/javascript')
+    image = FileField(u'Image File')
     page_title = TextField()
     submit = SubmitField()
     preview = SubmitField()

@@ -88,14 +88,7 @@ def page_edit(page_id):
     
     # Show a preview of the rendered HTML
     if request.method == 'GET':
-        # Form Attributes
-        form.page_title.render_kw = { 'value': page.title }
-        form.url.render_kw = { 'value': page.url }
-        form.markdown.render_kw = { 'markdown': page.markdown }
-        form.content.data = page.content
-        form.metadata.data = deserialize_metadata(page.meta)
-        form.created.data = page.created
-        form.template.data = page.template
+        form.fill(page)
     
     elif request.method == 'POST':
         if not form.validate():

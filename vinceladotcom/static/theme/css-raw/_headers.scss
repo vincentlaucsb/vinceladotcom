@@ -20,16 +20,21 @@ header.header-fixed {
     /* Flexbox */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     
     h1 {
         /*background: rgba($teal, 0.75);*/
         
-        font-weight: 300;
         text-align: center;
         line-height: 1.2;
-        font-size: 5vw;
+        font-size: 10vh;
         color: $white;
         padding: 1vh;
+
+        span {
+            font-size: 4vh;
+            font-weight: normal;
+            display: block;
+        }
     }
 }

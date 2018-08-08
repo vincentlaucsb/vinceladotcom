@@ -34,6 +34,19 @@ def get_github_repos():
 PAGE_GLOBALS = settings_loader()
 PAGE_GLOBALS['github'] = get_github_repos()
 
+# Helpers
+def invert_dict(d: dict) -> dict:
+    ''' Invert a dictionary, throwing an error if duplicate keys are found '''
+    ret = {}
+
+    for k, v in d.items():
+        if (v in ret.keys()):
+            raise ValueError("Duplicate key found")
+
+        ret[v] = k
+
+    return ret
+
 def render_template(*args, **kwargs):
     ''' Overload of render_template() which injects global variables '''
     for k in PAGE_GLOBALS.keys():
