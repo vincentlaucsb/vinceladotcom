@@ -1,5 +1,5 @@
 # Secrets
-static/blog/
+vinceladotcom/static/blog/display/
 secret.py
 *.sqlite
 
