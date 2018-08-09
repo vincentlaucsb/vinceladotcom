@@ -53,3 +53,10 @@ def render_template(*args, **kwargs):
         kwargs[k] = PAGE_GLOBALS[k]
     
     return flask.render_template(*args, **kwargs)
+
+def render_message(title: str, message: str):
+    return render_template(
+        'plain.html',
+        title=title,
+        message=message
+    )

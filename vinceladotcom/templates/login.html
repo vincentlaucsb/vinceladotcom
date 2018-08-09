@@ -10,8 +10,8 @@
     
 {% block content %}
     <form action="/login" method="post">
-        Name: {{ form.name }}
-        Password: {{ form.password }}
+        <label>Name {{ form.name }} </label>
+        <label>Password {{ form.password }} </label>
         
         {{ form.submit }}
     </form>

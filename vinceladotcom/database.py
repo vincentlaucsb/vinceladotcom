@@ -10,7 +10,7 @@ import json
 
 DISPLAY_IMAGE_DIR = os.path.join(STATIC_DIR, 'blog', 'display')
 
-def has_tag(tag_list, tag):
+def has_tag(tag_list: str, tag: str) -> bool:
     ''' Parse the tag field of a page '''
     
     tag_list = tag_list.split(',')
@@ -23,7 +23,7 @@ def has_tag(tag_list, tag):
     
     return False
 
-def title_to_url(title):
+def title_to_url(title: str) -> str:
     temp = title.lower()
     ret = ''
     for i in temp:
@@ -83,6 +83,8 @@ class BasePage(BaseModel):
         return [strip_leading_space(i) for i in self.tags.split(',')]
 
 class BlogPost(BasePage):
+    ''' Model for blog posts '''
+
     title = CharField(200, unique=True)
     author = CharField(200)
     draft = BooleanField(default=True)
@@ -94,15 +96,34 @@ class BlogPost(BasePage):
         return title_to_url(self.title)
 
     @property
+    def _image_name(self):
+        # TODO: Non-JPG images?
+        return '{}.jpg'.format(self.id)
+
+    @property
+    def _image_path(self):
+        return os.path.join(DISPLAY_IMAGE_DIR, self._image_name)
+
+    @property
     def image(self):
-        ''' Return the path to image (if it exists) '''
-        # TODO: Non JPG files?
-        image_name = '{}.jpg'.format(self.id)
-        image_path = os.path.join(DISPLAY_IMAGE_DIR, image_name)
-    
-        if os.path.isfile(image_path):
-            return '/static/blog/display/' + image_name
-        return None
+        ''' Return the path to display image (if it exists) '''
+        return '/static/blog/display/' + self._image_name if os.path.isfile(self._image_path) else None
+
+    def save_image(self, data):
+        ''' Upload image for post '''
+        def write():
+            data.save(self._image_path)
+
+        try:
+            write()
+        except FileNotFoundError:
+            os.makedirs(DISPLAY_IMAGE_DIR)
+            write()
+
+    def delete_image(self):
+        ''' Delete associated display image (if exists) or do nothing '''
+        if self.image:
+            os.remove(self._image_path)
     
 class Page(BasePage):
     title = CharField(200)

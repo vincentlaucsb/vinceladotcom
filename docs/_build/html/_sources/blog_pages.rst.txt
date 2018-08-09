@@ -3,6 +3,12 @@ Blog Posts and (Mostly) Static Pages
 
 Blogging and pages are implemented as separate Blueprints. However, they share many components in common.
 
+Blog Models
+------------
+
+.. autoclass:: vinceladotcom.database.BlogPost
+    :members:
+
 Forms
 ------
 

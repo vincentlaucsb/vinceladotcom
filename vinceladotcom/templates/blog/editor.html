@@ -11,25 +11,68 @@
 {% endblock %}
 {% block page_title %}
     {% if post %}
-    Editing: {{ post.title }}
+    Editing: <em style="font-weight: normal">{{ post.title }}</em>
     {% else %}
     New Post
     {% endif %}
 {% endblock %}
 
 {% block more_content %}
+<script type="text/javascript">
+    function image_delete(post_id) {
+        // Send DELETE request
+        var del_req = new XMLHttpRequest();
+        del_req.open('DELETE', '/blog/' + post_id.toString() + '?target=image');
+        del_req.onload = function () {
+            // Reload page without cache
+            window.location.reload(true);
+        };
+
+        del_req.send(null);
+    }
+</script>
+
 <!-- enctype="multipart/form-data" necessary for file transfer -->
+
+{% if post.image %}
+<div>
+    <img src="{{ post.image }}" alt="{{ post.title }} Display Image" />
+</div>
+<a onClick="image_delete({{ post.id }})">Delete Image</a>
+{% endif %}
+
 <form enctype="multipart/form-data" action="{{ target }}" method="post">
     {{ form.csrf }}
 
-    {% if post %}<input type="hidden" name="_method" value="put" />{% endif %}
+    {% if post %}
+    <input type="hidden" name="_method" value="put" />
+    {% endif %}
 
-    <label>Title: {{ form.page_title }}</label>
-    <label>Author: {{ current_user.full_name }} (logged in as {{ current_user.name }})</label>
-    <label>Date: {{ form.created }}</label>
-    <label>Image: {{ form.image }}</label>
-    <label>Tags: {{ form.tags }}</label>
-    <label>Draft: {{ form.draft }}</label>
+    <fieldset class="table">
+        <div>
+            <label for="page_title">Title</label> {{ form.page_title }}
+        </div>
+        
+        <div>
+            <label>Author</label> {{ current_user.full_name }} (logged in as {{ current_user.name }})
+        </div>
+
+        <div>
+            <label for="created">Date</label> {{ form.created }}
+        </div>
+
+        <div>
+            <label for="image">Image</label> {{ form.image }}
+        </div>
+
+        <div>
+            <label for="tags">Tags</label> {{ form.tags }}
+        </div>
+
+        <div>
+            <label for="draft">Draft</label> {{ form.draft }}
+        </div>
+    </fieldset>
 
     {{ form.content }}
 

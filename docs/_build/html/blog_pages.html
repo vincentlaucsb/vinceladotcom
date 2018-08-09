@@ -36,6 +36,45 @@
   <div class="section" id="blog-posts-and-mostly-static-pages">
 <h1>Blog Posts and (Mostly) Static Pages<a class="headerlink" href="#blog-posts-and-mostly-static-pages" title="Permalink to this headline">¶</a></h1>
 <p>Blogging and pages are implemented as separate Blueprints. However, they share many components in common.</p>
+<div class="section" id="blog-models">
+<h2>Blog Models<a class="headerlink" href="#blog-models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="vinceladotcom.database.BlogPost">
+<em class="property">class </em><code class="descclassname">vinceladotcom.database.</code><code class="descname">BlogPost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vinceladotcom/database.html#BlogPost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vinceladotcom.database.BlogPost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model for blog posts</p>
+<dl class="attribute">
+<dt id="vinceladotcom.database.BlogPost.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#vinceladotcom.database.BlogPost.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">BlogPostDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vinceladotcom.database.BlogPost.delete_image">
+<code class="descname">delete_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vinceladotcom/database.html#BlogPost.delete_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vinceladotcom.database.BlogPost.delete_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete associated display image (if exists) or do nothing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="vinceladotcom.database.BlogPost.image">
+<code class="descname">image</code><a class="headerlink" href="#vinceladotcom.database.BlogPost.image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the path to display image (if it exists)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vinceladotcom.database.BlogPost.save_image">
+<code class="descname">save_image</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vinceladotcom/database.html#BlogPost.save_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vinceladotcom.database.BlogPost.save_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload image for post</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="vinceladotcom.database.BlogPost.url">
+<code class="descname">url</code><a class="headerlink" href="#vinceladotcom.database.BlogPost.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return URL of blog post relative to /blog/</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="forms">
 <h2>Forms<a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h2>
 <p>This app defines additional custom fields in addition to the forms provided by WTForms which wrap the JavaScript-powered
@@ -77,6 +116,7 @@ triggers.</p>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Blog Posts and (Mostly) Static Pages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#blog-models">Blog Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#forms">Forms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="forms.html">Forms (in-depth)</a></li>
 </ul>

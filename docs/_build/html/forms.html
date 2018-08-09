@@ -46,7 +46,7 @@
 <span class="kn">import</span> <span class="nn">markupsafe</span>
 <span class="kn">from</span> <span class="nn">wtforms</span> <span class="k">import</span> <span class="n">validators</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="n">Form</span><span class="p">,</span> <span class="n">BooleanField</span><span class="p">,</span> <span class="n">TextAreaField</span><span class="p">,</span> \
     <span class="n">TextField</span><span class="p">,</span> <span class="n">SelectField</span><span class="p">,</span> <span class="n">SubmitField</span><span class="p">,</span> <span class="n">widgets</span><span class="p">,</span> <span class="n">core</span><span class="p">,</span> <span class="n">DateField</span>
-<span class="kn">from</span> <span class="nn">.config</span> <span class="k">import</span> <span class="n">CURRENT_DIR</span>
+<span class="kn">from</span> <span class="nn">vinceladotcom.config</span> <span class="k">import</span> <span class="n">CURRENT_DIR</span><span class="p">,</span> <span class="n">invert_dict</span>
 
 <span class="k">def</span> <span class="nf">get_templates</span><span class="p">():</span>
     <span class="n">templates</span> <span class="o">=</span> <span class="p">[]</span>
@@ -57,35 +57,90 @@
             
     <span class="k">return</span> <span class="n">templates</span>
 
+<span class="k">def</span> <span class="nf">parse_metadata</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Given colon delimited lines of key-value pairs, return </span>
+<span class="sd">    a JSON representation</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="n">temp</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># More than 2 colons</span>
+            <span class="n">splitted</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">splitted</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">splitted</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c1"># Remove carriage return</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Strip leading space</span>
+        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+            <span class="n">temp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">temp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">deserialize_metadata</span><span class="p">(</span><span class="n">_json</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Deserialize metadata &#39;&#39;&#39;</span>
+    
+    <span class="n">temp</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_json</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">temp</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    
+    <span class="k">return</span> <span class="n">temp</span>
+
 <span class="k">class</span> <span class="nc">BaseForm</span><span class="p">(</span><span class="n">Form</span><span class="p">):</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">created</span> <span class="o">=</span> <span class="n">DateField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
     <span class="n">tags</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">data_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; So instead of this:</span>
-<span class="sd">        database.Page(</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        So instead of this:</span>
+<span class="sd">            database.Page(</span>
 <span class="sd">                    id=page.id,  # So Peewee knows we want to do an UPDATE</span>
 <span class="sd">                    title=form.page_title.data,</span>
 <span class="sd">                    content=form.content.data,</span>
 <span class="sd">                    css=form.custom_css.data,</span>
 <span class="sd">                    url=form.url.data,</span>
 <span class="sd">                    markdown=form.markdown.data</span>
-<span class="sd">                ).save()</span>
+<span class="sd">            ).save()</span>
 <span class="sd">                </span>
 <span class="sd">        We can do this:</span>
-<span class="sd">        database.Page(</span>
-<span class="sd">            id=page.id,</span>
-<span class="sd">            **form.data_dict()            </span>
-<span class="sd">        ).save()</span>
+<span class="sd">            database.Page(</span>
+<span class="sd">                id=page.id,</span>
+<span class="sd">                **form.data_dict()            </span>
+<span class="sd">            ).save()</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="n">temp</span> <span class="o">=</span>  <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">db_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">}</span>
         
+        <span class="c1"># Parse metadata, TODO: Move to a subclass</span>
+        <span class="n">temp</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse_metadata</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">])</span>
+
         <span class="c1"># Convert datetime objects to strings</span>
-        <span class="n">temp</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">])</span>        
+        <span class="n">temp</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">temp</span>
-    
+
+    <span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_row</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Opposite of data_dict</span>
+<span class="sd">            Fill a form from a database object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">invert_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">db_mapping</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">db_row</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># Deserialize metadata, TODO: Move to a subclass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">deserialize_metadata</span><span class="p">(</span><span class="n">db_row</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
 <span class="k">class</span> <span class="nc">AceText</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">TextArea</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Custom widget for my ACE text editor hack &#39;&#39;&#39;</span>
 

@@ -2,37 +2,30 @@ from flask_login import login_required
 from flask import Blueprint, request, redirect
 from flask.views import MethodView, View
 from peewee import *
-
-from abc import ABC, abstractmethod
 import os
 
 from .forms import *
 from .. import markdown
-from ..config import render_template, STATIC_DIR
+from ..config import render_message, render_template, STATIC_DIR
 
 blog = Blueprint('blog', __name__)
+
+@blog.route("/blog/tags/<string:tag>", methods=['GET'])
+def tag_list(tag: str):
+    from .. import database            
+    return render_template(
+        'blog/index.html',
+        posts=database.BlogPost.select().where(
+            fn.has_tag(database.BlogPost.tags, tag)
+            ).order_by(
+            database.BlogPost.created.desc()))
 
 #################
 # Blog Controls
 #################
 
-def create_post_image(id, data):
-    ''' Create a display image for a blog '''
-    # TODO: Non JPG files?
-    image_name = '{}.jpg'.format(id)
-    image_path = os.path.join(DISPLAY_IMAGE_DIR, image_name)
-    
-    def write():
-        data.save(image_path)
-
-    try:
-        write()
-    except FileNotFoundError:
-        os.makedirs(image_folder)
-        write()
-
 @blog.route("/blog/<string:title>/", methods=['GET'])
-def blog_article(title):
+def blog_article(title: str):
     from .. import database
 
     article = database.BlogPost.get(fn.title_to_url(
@@ -56,11 +49,11 @@ def blog_new():
 class BlogAPI(MethodView):
 
     @staticmethod
-    def get_post(post_id):
+    def get_post(post_id: int):
         from .. import database
         return database.BlogPost.get(database.BlogPost.id == post_id)
     
-    def get(self, post_id=None):
+    def get(self, post_id: int = None):
         from .. import database
 
         if post_id is None:
@@ -97,7 +90,7 @@ class BlogAPI(MethodView):
                 post=post
             )
 
-    def post(self, post_id=None):
+    def post(self, post_id: int = None):
         from .. import database
 
         if (not post_id):
@@ -106,7 +99,7 @@ class BlogAPI(MethodView):
             post = database.BlogPost.create(author=current_user.full_name, **form.data_dict())
 
             if (request.files):  # Handle image
-                create_post_image(post.id, request.files['image'])
+                post.save_image(request.files['image'])
 
             return redirect('blog/' + post.url)
         else:
@@ -116,7 +109,7 @@ class BlogAPI(MethodView):
             else:
                 abort(405)
 
-    def put(self, post_id):
+    def put(self, post_id: int):
         # Update a page
         from .. import database
 
@@ -128,27 +121,27 @@ class BlogAPI(MethodView):
         post.save()
 
         if (request.files):  # Handle image
-            create_post_image(post.id, request.files['image'])
+            post.save_image(request.files['image'])
 
         return redirect('blog/' + post.url)
             
-    def delete(self, post_id):
-        # Delete the specified post
-
+    def delete(self, post_id: int):
+        # Delete the specified post or image
         post = self.get_post(post_id)
-        if (not post.deleted):
-            # Mark as "deleted" without deleting
-            post.deleted = True
-            post.save()
+
+        if (request.args.get('target', '') == 'image'):
+            # Delete associated image
+            post.delete_image()
         else:
-            # If marked as deleted, then perma-delete
-            post.delete_instance()
+            if (not post.deleted):
+                # Mark as "deleted" without deleting
+                post.deleted = True
+                post.save()
+            else:
+                # If marked as deleted, then perma-delete
+                post.delete_instance()
             
-        return render_template(
-            'message.html',
-            title='Deleted',
-            message='Deleted page'
-        )
+        return render_message(title='Deleted', message='Deleted item')
 
 blog_view = BlogAPI.as_view('blog_api')
 blog.add_url_rule(
@@ -160,20 +153,3 @@ blog.add_url_rule(
 # merely funnels PUT requests (or throws errors)
 blog.add_url_rule('/blog/<int:post_id>', view_func=blog_view,
                   methods=['GET', 'POST', 'PUT', 'DELETE'])
-    
-########
-# Tags #
-########
-
-@blog.route("/blog/tags/<tag>", methods=['GET'])
-def tag_list(tag):
-    from .. import database
-    posts = []
-    
-    for post in database.BlogPost.select().where(
-        fn.has_tag(database.BlogPost.tags, tag)
-        ).order_by(
-        database.BlogPost.created.desc()):
-        posts.append(post)
-            
-    return render_template('blog/index.html', posts=posts)

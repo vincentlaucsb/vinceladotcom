@@ -26,7 +26,7 @@ class SitemapEntry(dict):
     def __init__(self, *args, **kwargs):
         super(SitemapEntry, self).__init__(*args, **kwargs)
         
-    def to_string(self, site_url):
+    def to_string(self, site_url: str):
         ret = ''
         ret += '\t<url>\n'
         

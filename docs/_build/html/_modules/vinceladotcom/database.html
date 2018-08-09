@@ -1,0 +1,302 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vinceladotcom.database &#8212; vinceladotcom 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vinceladotcom.database</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">playhouse.pool</span> <span class="k">import</span> <span class="n">PooledSqliteDatabase</span>
+<span class="kn">from</span> <span class="nn">vinceladotcom.main</span> <span class="k">import</span> <span class="n">application</span>
+<span class="kn">from</span> <span class="nn">vinceladotcom.config</span> <span class="k">import</span> <span class="n">STATIC_DIR</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">DISPLAY_IMAGE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">STATIC_DIR</span><span class="p">,</span> <span class="s1">&#39;blog&#39;</span><span class="p">,</span> <span class="s1">&#39;display&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">has_tag</span><span class="p">(</span><span class="n">tag_list</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; Parse the tag field of a page &#39;&#39;&#39;</span>
+    
+    <span class="n">tag_list</span> <span class="o">=</span> <span class="n">tag_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tag_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">tag</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    
+    <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span> <span class="nf">title_to_url</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">temp</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="n">i</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="s1">&#39;p&#39;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="s1">&#39; &#39;</span><span class="p">):</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="s1">&#39;-&#39;</span>
+            
+        <span class="c1"># Strip other characters</span>
+    
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDatabase</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="n">application</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATABASE&#39;</span><span class="p">])</span>
+<span class="n">db</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">has_tag</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;has_tag&#39;</span><span class="p">,</span> <span class="n">num_params</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">title_to_url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;title_to_url&#39;</span><span class="p">,</span> <span class="n">num_params</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BaseModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">db</span>
+        
+<span class="k">class</span> <span class="nc">BaseRevision</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Base class for revision history models &#39;&#39;&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
+    <span class="n">modified</span> <span class="o">=</span> <span class="n">DateField</span><span class="p">()</span>
+    
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">db</span>
+        <span class="n">primary_key</span> <span class="o">=</span> <span class="kc">False</span>
+        
+<span class="k">class</span> <span class="nc">BasePage</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">created</span> <span class="o">=</span> <span class="n">DateField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+    <span class="n">modified</span> <span class="o">=</span> <span class="n">DateField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+    <span class="n">deleted</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BasePage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta_parsed</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta_parsed</span> <span class="o">=</span> <span class="n">meta_data</span>
+            
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">meta_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">strip_leading_space</span><span class="p">(</span><span class="n">_str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+                <span class="n">_str</span> <span class="o">=</span> <span class="n">_str</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="p">]</span>
+            <span class="k">return</span> <span class="n">_str</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">strip_leading_space</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="BlogPost"><a class="viewcode-back" href="../../blog_pages.html#vinceladotcom.database.BlogPost">[docs]</a><span class="k">class</span> <span class="nc">BlogPost</span><span class="p">(</span><span class="n">BasePage</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Model for blog posts &#39;&#39;&#39;</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">draft</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return URL of blog post relative to /blog/ &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">title_to_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_image_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO: Non-JPG images?</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.jpg&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_image_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DISPLAY_IMAGE_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return the path to display image (if it exists) &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;/static/blog/display/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_name</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BlogPost.save_image"><a class="viewcode-back" href="../../blog_pages.html#vinceladotcom.database.BlogPost.save_image">[docs]</a>    <span class="k">def</span> <span class="nf">save_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Upload image for post &#39;&#39;&#39;</span>
+        <span class="k">def</span> <span class="nf">write</span><span class="p">():</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">write</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DISPLAY_IMAGE_DIR</span><span class="p">)</span>
+            <span class="n">write</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BlogPost.delete_image"><a class="viewcode-back" href="../../blog_pages.html#vinceladotcom.database.BlogPost.delete_image">[docs]</a>    <span class="k">def</span> <span class="nf">delete_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Delete associated display image (if exists) or do nothing &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_path</span><span class="p">)</span></div></div>
+    
+<span class="k">class</span> <span class="nc">Page</span><span class="p">(</span><span class="n">BasePage</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">custom_css</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
+    <span class="n">markdown</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+<span class="k">class</span> <span class="nc">BlogRevisions</span><span class="p">(</span><span class="n">BaseRevision</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">SQL</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">            FOREIGN KEY(id) REFERENCES blogpost(id) ON DELETE CASCADE&#39;&#39;&#39;</span><span class="p">)]</span>
+
+<span class="k">class</span> <span class="nc">PageRevisions</span><span class="p">(</span><span class="n">BaseRevision</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">SQL</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">            FOREIGN KEY(id) REFERENCES page(id) ON DELETE CASCADE&#39;&#39;&#39;</span><span class="p">)]</span>
+    
+<span class="k">class</span> <span class="nc">Users</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span> <span class="c1"># Should not be plaintext</span>
+    <span class="n">full_name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">is_admin</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="c1"># This object is only returned on successful authentication attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="o">=</span> <span class="kc">True</span>
+        
+    <span class="k">def</span> <span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    
+    <span class="k">def</span> <span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<span class="k">def</span> <span class="nf">db_init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Create tables</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span>
+        <span class="n">Users</span><span class="p">,</span>
+        <span class="n">BlogPost</span><span class="p">,</span>
+        <span class="n">Page</span><span class="p">,</span>
+        <span class="n">BlogRevisions</span><span class="p">,</span>
+        <span class="n">PageRevisions</span>
+    <span class="p">])</span>
+
+    <span class="c1"># Post/Page Revision History</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">execute_sql</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">        CREATE TRIGGER IF NOT EXISTS blog_revisions_ins</span>
+<span class="s1">        UPDATE OF content on blogpost</span>
+<span class="s1">            BEGIN</span>
+<span class="s1">                INSERT INTO blogrevisions VALUES(</span>
+<span class="s1">                    old.id,</span>
+<span class="s1">                    old.content,</span>
+<span class="s1">                    old.modified</span>
+<span class="s1">                );</span>
+<span class="s1">            END;</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+        
+    <span class="n">db</span><span class="o">.</span><span class="n">execute_sql</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">        CREATE TRIGGER IF NOT EXISTS page_revisions_ins</span>
+<span class="s1">        UPDATE OF content on page</span>
+<span class="s1">            BEGIN</span>
+<span class="s1">                INSERT INTO pagerevisions VALUES(</span>
+<span class="s1">                    old.id,</span>
+<span class="s1">                    old.content,</span>
+<span class="s1">                    old.modified</span>
+<span class="s1">                );</span>
+<span class="s1">            END;</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">vinceladotcom</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auth.html">Authentication</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../blog_pages.html">Blog Posts and (Mostly) Static Pages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../sitemap.html">Sitemap Generator</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../nginx.html">Nginx + uWSGI Deployment Notes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Vincent La.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
