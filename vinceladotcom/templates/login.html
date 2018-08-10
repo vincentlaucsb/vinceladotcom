@@ -1,13 +1,8 @@
-{% extends "base.html" %}
-
-{% block more_head %}
-<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
-
-{% endblock %}
+{% extends "plain.html" %}
 
 {% block title %}Log In{% endblock %}
 {% block page_title %}Log In{% endblock %}
-    
+
 {% block content %}
     <form action="/login" method="post">
         <label>Name {{ form.name }} </label>

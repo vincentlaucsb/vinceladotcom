@@ -1,1 +1,1 @@
-sass --watch css-raw:css --style compressed
+sass --watch sass:css --style compressed

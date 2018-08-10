@@ -1,0 +1,84 @@
+@import 'colors';
+
+table { table-layout: fixed; }
+
+th > a { color: rgba(255, 255, 255, 1); font-size: 90%; }
+
+td { vertical-align: text-top; }
+
+td.example, td.code, pre > code {
+    font-size: 95%;
+}
+
+#content section {
+    table { font-family: $sans-serif; }
+    td.example * {
+        margin: 0;
+        color: #333333;
+    }
+}
+
+/* Override tutorial.css style */
+td > pre > code { border-left: none; }
+
+td ol, td ul {
+    list-style-position: inside;
+    padding-left: 0;
+}
+
+/* Nav */
+#toc { 
+    width: 100%;
+    font-family: Montserrat, sans-serif;
+    display: flex;
+    align-items: space-around;
+    flex-wrap: wrap;
+    
+    a {
+        min-width: 5em;
+        padding: 0.25em 0.5em 0.25em 0.5em;
+        margin: 0.25em;
+        
+        text-align: center;
+        text-decoration: none;
+        
+        color: $light-gray;
+        display: inline-block;
+        
+        flex-grow: 1;
+    }
+    
+    a:nth-child(4n + 1) { background: lighten($charcoal, 5%); }
+    a:nth-child(4n + 1):hover { background: darken($charcoal, 5%); }
+    
+    a:nth-child(4n + 2) { background: darken($teal, 10%); }
+    a:nth-child(4n + 2):hover { background: darken($teal, 20%); }
+
+    a:nth-child(4n + 3) { background: darken($od-green, 0%); }
+    a:nth-child(4n + 3):hover { background: darken($od-green, 20%); }
+
+    a:nth-child(4n) { background: lighten($dirt, 5%);}
+    a:nth-child(4n):hover { background: darken($dirt, 5%); }
+}
+
+/* For the headers example */
+td.ex-heading {
+    font-weight: bold;
+    background: darken($light-gray, 5%);
+    border-bottom: 0;
+}
+
+/* Needs to match font_different.css */
+table.font-diff-ex h1, table.font-diff-ex h2 {
+    font-family: Georgia, sans-serif;
+}
+
+table.font-diff-ex {
+    font-family: Tahoma, sans-serif;
+}
+
+/* For the custom bullet example */
+#custom-bullet-ex {
+    li { list-style-type: none; }
+    li:before { content: "\00A9  "; }
+}

@@ -1,0 +1,40 @@
+header.header-fixed {
+    background: rgba(lighten($charcoal, 5%), 1);
+    position: fixed;
+    top: 0;
+}
+
+#title.title-regular {
+    /* margin-top: header-height (approx) + $big-skip */
+    margin-top: (2*$small-skip + 2.2em) + $big-skip;
+    h1 { border-bottom: 2px solid darken($light-gray, 15%); }
+}
+
+/* Yuge Titles */
+#title.title-big {
+    margin-bottom: $big-skip;
+    
+    /* Background */
+    height: 66vh;
+
+    /* Flexbox */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    
+    h1 {
+        /*background: rgba($teal, 0.75);*/
+        
+        text-align: center;
+        line-height: 1.2;
+        font-size: 10vh;
+        color: $white;
+        padding: 1vh;
+
+        span {
+            font-size: 4vh;
+            font-weight: normal;
+            display: block;
+        }
+    }
+}

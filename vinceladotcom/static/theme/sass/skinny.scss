@@ -1,0 +1,16 @@
+@import 'colors';
+@import 'standard';
+
+#title.title-regular {
+    span {
+        display: block;
+        font-size: $regular-size;
+        font-weight: normal;
+    }
+}
+
+article {
+    p, ul {
+        max-width: 40em;
+    }
+}
