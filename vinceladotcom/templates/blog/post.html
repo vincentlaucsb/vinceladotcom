@@ -18,6 +18,12 @@
 <meta property="og:description" content="{{post.description}}" />
 {% endif %}
 
+{% if 'og:image' not in post.meta_parsed.keys() %}
+    {% if post.image %}
+    <meta property="og:image" content="http://vincela.com{{post.image}}" />
+    {% endif %}
+{% endif %}
+
 <meta property="og:url" content="{{request.url}}" />
 
 {% endblock %}
