@@ -13,33 +13,34 @@
     </ul>
     {% endif %}
 
-    <h2>Edit Page</h2>
     <form action="{{ target }}" method="post">
         {{ form.csrf}}
         
-        <label>
-            Title: {{ form.page_title }}
-        </label>
-        
-        <label>
-            Template: {{ form.template }}
-        </label>
+        <fieldset class="table">
+            <div>
+                <label for="page_title">Title</label> {{ form.page_title }}
+            </div>
 
-        <label>
-            Date: {{ form.created }}
-        </label>
-        
-        <label>
-            URL: {{ form.url }}
-        </label>
+            <div>
+                <label for="template">Template</label> {{ form.template }}
+            </div>
 
-        <label>
-            Tags: {{ form.tags }}
-        </label>
-        
-        <label>
-            Markdown: {{ form.markdown }}
-        </label>
+            <div>
+                <label for="created">Date</label> {{ form.created }}
+            </div>
+
+            <div>
+                <label for="url">URL</label> {{ form.url }}
+            </div>
+            
+            <div>
+                <label for="tags">Tags</label> {{ form.tags }}
+            </div>
+
+            <div>
+                <label for="markdown">Markdown</label> {{ form.markdown }}
+            </div>
+        </fieldset>
         
         {{ form.content }}
         

@@ -1,10 +1,6 @@
-{% extends "base.html" %}
+{% extends "plain.html" %}
 
 <!-- Note: User currently needs to be authenticated to see this page -->
-
-{% block more_head %}
-<link href="{{ url_for('static', filename='theme/css/one-column.css') }}" rel='stylesheet' type='text/css'>
-{% endblock %}
 
 {% block title_class %}title-regular{% endblock %}
 {% block title %}Pages{% endblock %}

@@ -15,6 +15,7 @@ page = Blueprint('page', __name__)
 @page.route("/pages/", methods=['GET'])
 @login_required
 def page_list():
+    from .. import database
     posts = [i for i in database.Page.select()]
    
     return render_template('pages/index.html', posts=posts)
