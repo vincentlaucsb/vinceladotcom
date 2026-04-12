@@ -1,17 +1,29 @@
-# Secrets
+# Secrets and local data
 vinceladotcom/static/blog/display/
 secret.py
 *.sqlite
+github.json
 
-# Python
-*.pyc
+# Node package manager
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Testing
+# Build outputs
+dist/
+.parcel-cache/
+coverage/
+*.tsbuildinfo
+
+# Tooling caches and logs
 .cache/
-.pytest_cache/
 *.log
 
-# Other Garbage
+# Editor and OS clutter
 .vs/
+.vscode/*
 .sass-cache/
-github.json
+.DS_Store
+Thumbs.db

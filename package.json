@@ -1,0 +1,17 @@
+{
+  "name": "vinceladotcom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal site SPA with bundled and minified assets",
+  "scripts": {
+    "dev": "parcel index.html --open",
+    "build": "parcel build index.html --dist-dir dist --public-url ./",
+    "preview": "npx serve dist"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.16.4",
+    "parcel": "^2.14.4",
+    "sass": "^1.99.0",
+    "serve": "^14.2.4"
+  }
+}
