@@ -20,9 +20,14 @@ body {
   font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
   color: var(--text-main);
   background:
+    linear-gradient(to bottom, rgba(246, 247, 242, 0.97) 0%, rgba(246, 247, 242, 0.9) 24%, rgba(246, 247, 242, 0.72) 48%, rgba(246, 247, 242, 0.42) 68%, rgba(246, 247, 242, 0.16) 82%, rgba(246, 247, 242, 0) 94%),
     radial-gradient(circle at 12% 14%, rgba(255, 193, 84, 0.35), transparent 35%),
     radial-gradient(circle at 84% 10%, rgba(71, 116, 255, 0.24), transparent 38%),
-    linear-gradient(140deg, var(--bg-1), var(--bg-2));
+    linear-gradient(140deg, rgba(246, 247, 242, 0.74), rgba(240, 233, 223, 0.58)),
+    url("../20230519_181901.webp");
+  background-size: auto, auto, auto, auto, cover;
+  background-position: center top, 12% 14%, 84% 10%, center top, center bottom;
+  background-repeat: no-repeat;
 }
 
 .subtitle {
@@ -46,6 +51,7 @@ body {
 .page {
   width: min(1040px, 92vw);
   margin: 48px auto;
+  padding-bottom: 10rem;
   display: grid;
   gap: 26px;
 }
@@ -104,6 +110,10 @@ h1 {
   font-size: 1.15rem;
 }
 
+.links-title:not(:first-of-type) {
+  margin-top: 32px;
+}
+
 .links-grid {
   margin: 0;
   padding: 0;
@@ -132,6 +142,10 @@ h1 {
 
 .link-card:nth-child(4) {
   animation-delay: 210ms;
+}
+
+.link-card:nth-child(5) {
+  animation-delay: 280ms;
 }
 
 .link-anchor {
@@ -177,8 +191,9 @@ h1 {
 
 .footer {
   margin-top: 2px;
-  color: var(--text-soft);
+  color: var(--text-main);
   font-size: 0.87rem;
+  text-align: center;
 }
 
 @keyframes card-enter {
@@ -191,6 +206,7 @@ h1 {
 @media (max-width: 800px) {
   .page {
     margin: 24px auto;
+    padding-bottom: 4.5rem;
     gap: 16px;
   }
 
