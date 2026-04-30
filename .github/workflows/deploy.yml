@@ -10,6 +10,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master        # ← This is the key fix
 
       - name: Deploy to Droplet
         uses: appleboy/ssh-action@v1.0.3
