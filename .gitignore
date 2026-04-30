@@ -12,7 +12,6 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Build outputs
-dist/
 .parcel-cache/
 coverage/
 *.tsbuildinfo
