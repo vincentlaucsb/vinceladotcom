@@ -1,0 +1,11 @@
+services:
+  vincela-web:
+    build: .
+    image: vincela-site:latest
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
