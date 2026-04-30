@@ -1,5 +1,5 @@
 services:
-  vincela-web:
+  vincela-web:          # ← This name must match Caddyfile
     build: .
     image: vincela-site:latest
     restart: unless-stopped
