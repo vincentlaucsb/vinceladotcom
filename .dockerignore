@@ -1,0 +1,8 @@
+node_modules
+.parcel-cache
+.git
+.github
+dist
+coverage
+*.log
+*.tsbuildinfo

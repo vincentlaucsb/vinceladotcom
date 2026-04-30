@@ -4,15 +4,15 @@ on:
   push:
     branches: [ master ]
 
+concurrency:
+  group: deploy-vincela-com
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: master        # ← This is the key fix
-
       - name: Deploy to Droplet
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -20,8 +20,10 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
+            set -e
             cd /var/www/vincela.com
-            git pull origin master --rebase
-            docker compose down
-            docker compose up -d --build
-            echo "✅ vincela.com deployed at $(date)"
+            git pull --ff-only origin master
+            docker compose build
+            docker compose up -d --remove-orphans
+            docker image prune -f
+            echo "vincela.com deployed at $(date)"

@@ -1,7 +1,12 @@
+FROM node:22-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
 FROM nginx:alpine
 
-# Copy built Vite files
-COPY dist /usr/share/nginx/html
-
-# Basic security
+COPY --from=build /app/dist /usr/share/nginx/html
 RUN echo 'server_tokens off;' > /etc/nginx/conf.d/security.conf

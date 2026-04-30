@@ -1,10 +1,12 @@
 services:
-  vincela-web:          # ← This name must match Caddyfile
+  vincela-web:
     build: .
     image: vincela-site:latest
     restart: unless-stopped
     networks:
-      - proxy-net
+      proxy-net:
+        aliases:
+          - vincela-web
 
 networks:
   proxy-net:
