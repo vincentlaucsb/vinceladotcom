@@ -1,8 +1,8 @@
-name: Deploy to DigitalOcean
+name: Deploy vincela.com
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy via SSH
+      - name: Deploy to Droplet
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DROPLET_HOST }}
@@ -19,7 +19,7 @@ jobs:
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
             cd /var/www/vincela.com
-            git pull origin main --rebase
+            git pull origin master --rebase
             docker compose down
             docker compose up -d --build
-            docker system prune -f --all
+            echo "✅ vincela.com deployed at $(date)"
