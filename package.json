@@ -5,6 +5,7 @@
   "description": "Personal site SPA with bundled and minified assets",
   "scripts": {
     "dev": "parcel index.html --open",
+    "prebuild": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "build": "parcel build index.html --dist-dir dist --public-url ./",
     "preview": "npx serve dist"
   },

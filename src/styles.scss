@@ -1,13 +1,68 @@
 :root {
-  --bg-1: #f6f7f2;
-  --bg-2: #f0e9df;
+  color-scheme: light dark;
+
+  --bg-image: url("/20230519_181901-optimized.webp");
+  --bg-layer-fade: linear-gradient(
+    to bottom,
+    rgba(246, 247, 242, 0.88) 0%,
+    rgba(246, 247, 242, 0.74) 22%,
+    rgba(246, 247, 242, 0.5) 46%,
+    rgba(246, 247, 242, 0.26) 64%,
+    rgba(246, 247, 242, 0.08) 80%,
+    rgba(246, 247, 242, 0) 92%
+  );
+  --bg-layer-warm: radial-gradient(circle at 12% 14%, rgba(255, 193, 84, 0.35), transparent 35%);
+  --bg-layer-cool: radial-gradient(circle at 84% 10%, rgba(71, 116, 255, 0.24), transparent 38%);
+  --bg-layer-base: linear-gradient(140deg, rgba(246, 247, 242, 0.74), rgba(240, 233, 223, 0.58));
+
   --surface: rgba(255, 255, 255, 0.75);
+  --surface-strong: rgba(255, 255, 255, 0.9);
   --surface-border: rgba(28, 35, 33, 0.12);
+  --card-border: rgba(28, 35, 33, 0.13);
+
   --text-main: #1c2321;
   --text-soft: #4e5b57;
+
   --accent: #0b5fff;
   --accent-strong: #003eb0;
+  --link-hover-bg: rgba(11, 95, 255, 0.08);
+  --accent-border: rgba(0, 62, 176, 0.25);
+
   --shadow: 0 20px 60px rgba(22, 26, 25, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-image: url("/20250913_184326-optimized.webp");
+    --bg-layer-fade: linear-gradient(
+      to bottom,
+      rgba(10, 15, 21, 0.74) 0%,
+      rgba(10, 15, 21, 0.61) 22%,
+      rgba(10, 15, 21, 0.43) 44%,
+      rgba(10, 15, 21, 0.25) 62%,
+      rgba(10, 15, 21, 0.12) 80%,
+      rgba(10, 15, 21, 0.03) 92%,
+      rgba(10, 15, 21, 0) 100%
+    );
+    --bg-layer-warm: radial-gradient(circle at 16% 14%, rgba(170, 117, 58, 0.22), transparent 36%);
+    --bg-layer-cool: radial-gradient(circle at 84% 12%, rgba(84, 139, 184, 0.26), transparent 40%);
+    --bg-layer-base: linear-gradient(140deg, rgba(12, 18, 24, 0.72), rgba(18, 30, 41, 0.56));
+
+    --surface: rgba(13, 21, 30, 0.78);
+    --surface-strong: rgba(17, 27, 37, 0.9);
+    --surface-border: rgba(191, 217, 238, 0.2);
+    --card-border: rgba(198, 221, 240, 0.22);
+
+    --text-main: #e8f1f7;
+    --text-soft: #b9c9d7;
+
+    --accent: #8ec7ff;
+    --accent-strong: #b5dcff;
+    --link-hover-bg: rgba(142, 199, 255, 0.16);
+    --accent-border: rgba(181, 220, 255, 0.35);
+
+    --shadow: 0 24px 70px rgba(1, 6, 11, 0.46);
+  }
 }
 
 * {
@@ -20,32 +75,32 @@ body {
   font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
   color: var(--text-main);
   background:
-    linear-gradient(to bottom, rgba(246, 247, 242, 0.97) 0%, rgba(246, 247, 242, 0.9) 24%, rgba(246, 247, 242, 0.72) 48%, rgba(246, 247, 242, 0.42) 68%, rgba(246, 247, 242, 0.16) 82%, rgba(246, 247, 242, 0) 94%),
-    radial-gradient(circle at 12% 14%, rgba(255, 193, 84, 0.35), transparent 35%),
-    radial-gradient(circle at 84% 10%, rgba(71, 116, 255, 0.24), transparent 38%),
-    linear-gradient(140deg, rgba(246, 247, 242, 0.74), rgba(240, 233, 223, 0.58)),
-    url("../20230519_181901.webp");
+    var(--bg-layer-fade),
+    var(--bg-layer-warm),
+    var(--bg-layer-cool),
+    var(--bg-layer-base),
+    var(--bg-image);
   background-size: auto, auto, auto, auto, cover;
   background-position: center top, 12% 14%, 84% 10%, center top, center bottom;
   background-repeat: no-repeat;
 }
 
 .subtitle {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 
-    > * {
-        margin: 14px 0 0;
-        font-size: clamp(1rem, 2.2vw, 1.35rem);
-        color: var(--accent-strong);
-        font-weight: 650;
-    }
+  > * {
+    margin: 14px 0 0;
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    color: var(--accent-strong);
+    font-weight: 650;
+  }
 
-    > *:not(:first-child):before {
-        content: '|';
-        margin-right: 14px;
-    }
+  > *:not(:first-child):before {
+    content: "|";
+    margin-right: 14px;
+  }
 }
 
 .page {
@@ -123,9 +178,9 @@ h1 {
 }
 
 .link-card {
-  border: 1px solid rgba(28, 35, 33, 0.13);
+  border: 1px solid var(--card-border);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-strong);
   overflow: hidden;
   transform: translateY(12px);
   opacity: 0;
@@ -164,7 +219,7 @@ h1 {
 
 .link-anchor:hover,
 .link-anchor:focus-visible {
-  background: rgba(11, 95, 255, 0.08);
+  background: var(--link-hover-bg);
   outline: none;
 }
 
@@ -184,7 +239,7 @@ h1 {
   grid-area: arrow;
   font-size: 0.84rem;
   color: var(--accent-strong);
-  border: 1px solid rgba(0, 62, 176, 0.25);
+  border: 1px solid var(--accent-border);
   border-radius: 999px;
   padding: 6px 10px;
 }
