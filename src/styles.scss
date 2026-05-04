@@ -206,42 +206,58 @@ h1 {
 .link-anchor {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "label arrow"
-    "note arrow";
-  gap: 4px 12px;
+  gap: 12px;
   align-items: center;
-  text-decoration: none;
   color: inherit;
   padding: 16px 18px;
   transition: background 220ms ease;
 }
 
-.link-anchor:hover,
-.link-anchor:focus-visible {
+.link-card:focus-within .link-anchor,
+.link-card:hover .link-anchor {
   background: var(--link-hover-bg);
-  outline: none;
+}
+
+.link-content {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
 .link-label {
-  grid-area: label;
   font-size: 1.02rem;
   font-weight: 650;
 }
 
 .link-note {
-  grid-area: note;
   font-size: 0.92rem;
   color: var(--text-soft);
 }
 
+.link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .link-arrow {
-  grid-area: arrow;
   font-size: 0.84rem;
   color: var(--accent-strong);
   border: 1px solid var(--accent-border);
   border-radius: 999px;
   padding: 6px 10px;
+  text-decoration: none;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.link-arrow:hover,
+.link-arrow:focus-visible {
+  background: var(--link-hover-bg);
+  border-color: var(--accent-strong);
+  outline: none;
 }
 
 .footer {
@@ -277,5 +293,13 @@ h1 {
 
   .hero-photo {
     max-height: 280px;
+  }
+
+  .link-anchor {
+    grid-template-columns: 1fr;
+  }
+
+  .link-actions {
+    justify-content: flex-start;
   }
 }

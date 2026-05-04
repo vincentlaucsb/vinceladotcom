@@ -9,4 +9,4 @@ RUN npm run build
 FROM nginx:alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
-RUN echo 'server_tokens off;' > /etc/nginx/conf.d/security.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
